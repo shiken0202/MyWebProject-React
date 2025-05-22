@@ -1,0 +1,523 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "storeId": 1,
+      "name": "衣服A",
+      "brand": "Uniqlo",
+      "category": "clothes",
+      "subCategory": "male",
+      "price": 800,
+      "views": 50
+    },
+    {
+      "id": 2,
+      "storeId": 2,
+      "name": "衣服B",
+      "brand": "GU",
+      "category": "clothes",
+      "subCategory": "female",
+      "price": 1290,
+      "views": 67
+    },
+    {
+      "id": 3,
+      "storeId": 5,
+      "name": "衣服C",
+      "brand": "Zara",
+      "category": "clothes",
+      "subCategory": "unisex",
+      "price": 1580,
+      "views": 45
+    },
+    {
+      "id": 4,
+      "storeId": 3,
+      "name": "衣服D",
+      "brand": "Adidas",
+      "category": "clothes",
+      "subCategory": "male",
+      "price": 920,
+      "views": 83
+    },
+    {
+      "id": 5,
+      "storeId": 1,
+      "name": "包包A",
+      "brand": "Coach",
+      "category": "bags",
+      "subCategory": "female",
+      "price": 4990,
+      "views": 122
+    },
+    {
+      "id": 6,
+      "storeId": 2,
+      "name": "包包B",
+      "brand": "Nike",
+      "category": "bags",
+      "subCategory": "male",
+      "price": 3650,
+      "views": 94
+    },
+    {
+      "id": 7,
+      "storeId": 3,
+      "name": "包包C",
+      "brand": "Gucci",
+      "category": "bags",
+      "subCategory": "accessories",
+      "price": 7990,
+      "views": 188
+    },
+    {
+      "id": 8,
+      "storeId": 4,
+      "name": "包包D",
+      "brand": "Prada",
+      "category": "bags",
+      "subCategory": "female",
+      "price": 7200,
+      "views": 210
+    },
+    {
+      "id": 9,
+      "storeId": 5,
+      "name": "玩偶A",
+      "brand": "Chiikawa",
+      "category": "dolls",
+      "subCategory": "chiikawa",
+      "price": 980,
+      "views": 144
+    },
+    {
+      "id": 10,
+      "storeId": 1,
+      "name": "玩偶B",
+      "brand": "Sanrio",
+      "category": "dolls",
+      "subCategory": "sunrio",
+      "price": 850,
+      "views": 115
+    },
+    {
+      "id": 11,
+      "storeId": 2,
+      "name": "玩偶C",
+      "brand": "Disney",
+      "category": "dolls",
+      "subCategory": "others",
+      "price": 1250,
+      "views": 95
+    },
+    {
+      "id": 12,
+      "storeId": 3,
+      "name": "衣服E",
+      "brand": "H&M",
+      "category": "clothes",
+      "subCategory": "male",
+      "price": 890,
+      "views": 54
+    },
+    {
+      "id": 13,
+      "storeId": 4,
+      "name": "衣服F",
+      "brand": "Uniqlo",
+      "category": "clothes",
+      "subCategory": "female",
+      "price": 1120,
+      "views": 63
+    },
+    {
+      "id": 14,
+      "storeId": 5,
+      "name": "衣服G",
+      "brand": "GU",
+      "category": "clothes",
+      "subCategory": "unisex",
+      "price": 1390,
+      "views": 72
+    },
+    {
+      "id": 15,
+      "storeId": 1,
+      "name": "包包E",
+      "brand": "Nike",
+      "category": "bags",
+      "subCategory": "male",
+      "price": 3100,
+      "views": 49
+    },
+    {
+      "id": 16,
+      "storeId": 2,
+      "name": "包包F",
+      "brand": "Coach",
+      "category": "bags",
+      "subCategory": "female",
+      "price": 4550,
+      "views": 98
+    },
+    {
+      "id": 17,
+      "storeId": 3,
+      "name": "包包G",
+      "brand": "Adidas",
+      "category": "bags",
+      "subCategory": "accessories",
+      "price": 2400,
+      "views": 66
+    },
+    {
+      "id": 18,
+      "storeId": 4,
+      "name": "包包H",
+      "brand": "Gucci",
+      "category": "bags",
+      "subCategory": "male",
+      "price": 6700,
+      "views": 157
+    },
+    {
+      "id": 19,
+      "storeId": 5,
+      "name": "玩偶D",
+      "brand": "Bandai",
+      "category": "dolls",
+      "subCategory": "others",
+      "price": 990,
+      "views": 108
+    },
+    {
+      "id": 20,
+      "storeId": 1,
+      "name": "玩偶E",
+      "brand": "Sanrio",
+      "category": "dolls",
+      "subCategory": "sunrio",
+      "price": 880,
+      "views": 134
+    },
+    {
+      "id": 21,
+      "storeId": 2,
+      "name": "玩偶F",
+      "brand": "Chiikawa",
+      "category": "dolls",
+      "subCategory": "chiikawa",
+      "price": 920,
+      "views": 77
+    },
+    {
+      "id": 22,
+      "storeId": 3,
+      "name": "衣服H",
+      "brand": "Zara",
+      "category": "clothes",
+      "subCategory": "male",
+      "price": 1280,
+      "views": 59
+    },
+    {
+      "id": 23,
+      "storeId": 4,
+      "name": "衣服I",
+      "brand": "Adidas",
+      "category": "clothes",
+      "subCategory": "female",
+      "price": 1380,
+      "views": 71
+    },
+    {
+      "id": 24,
+      "storeId": 5,
+      "name": "衣服J",
+      "brand": "H&M",
+      "category": "clothes",
+      "subCategory": "unisex",
+      "price": 1190,
+      "views": 80
+    },
+    {
+      "id": 25,
+      "storeId": 1,
+      "name": "包包I",
+      "brand": "Prada",
+      "category": "bags",
+      "subCategory": "female",
+      "price": 7650,
+      "views": 196
+    },
+    {
+      "id": 26,
+      "storeId": 2,
+      "name": "包包J",
+      "brand": "Nike",
+      "category": "bags",
+      "subCategory": "accessories",
+      "price": 2700,
+      "views": 88
+    },
+    {
+      "id": 27,
+      "storeId": 3,
+      "name": "包包K",
+      "brand": "Coach",
+      "category": "bags",
+      "subCategory": "male",
+      "price": 3800,
+      "views": 109
+    },
+    {
+      "id": 28,
+      "storeId": 4,
+      "name": "包包L",
+      "brand": "Gucci",
+      "category": "bags",
+      "subCategory": "female",
+      "price": 6900,
+      "views": 205
+    },
+    {
+      "id": 29,
+      "storeId": 5,
+      "name": "玩偶G",
+      "brand": "Takara Tomy",
+      "category": "dolls",
+      "subCategory": "others",
+      "price": 1180,
+      "views": 102
+    },
+    {
+      "id": 30,
+      "storeId": 1,
+      "name": "玩偶H",
+      "brand": "Sanrio",
+      "category": "dolls",
+      "subCategory": "sunrio",
+      "price": 950,
+      "views": 97
+    },
+    {
+      "id": 31,
+      "storeId": 2,
+      "name": "玩偶I",
+      "brand": "Chiikawa",
+      "category": "dolls",
+      "subCategory": "chiikawa",
+      "price": 1020,
+      "views": 88
+    },
+    {
+      "id": 32,
+      "storeId": 3,
+      "name": "衣服K",
+      "brand": "GU",
+      "category": "clothes",
+      "subCategory": "male",
+      "price": 880,
+      "views": 52
+    },
+    {
+      "id": 33,
+      "storeId": 4,
+      "name": "衣服L",
+      "brand": "Uniqlo",
+      "category": "clothes",
+      "subCategory": "female",
+      "price": 1100,
+      "views": 60
+    },
+    {
+      "id": 34,
+      "storeId": 5,
+      "name": "衣服M",
+      "brand": "H&M",
+      "category": "clothes",
+      "subCategory": "unisex",
+      "price": 1320,
+      "views": 91
+    },
+    {
+      "id": 35,
+      "storeId": 1,
+      "name": "包包M",
+      "brand": "Adidas",
+      "category": "bags",
+      "subCategory": "male",
+      "price": 2950,
+      "views": 64
+    },
+    {
+      "id": 36,
+      "storeId": 2,
+      "name": "包包N",
+      "brand": "Prada",
+      "category": "bags",
+      "subCategory": "female",
+      "price": 7350,
+      "views": 199
+    },
+    {
+      "id": 37,
+      "storeId": 3,
+      "name": "包包O",
+      "brand": "Nike",
+      "category": "bags",
+      "subCategory": "accessories",
+      "price": 2200,
+      "views": 77
+    },
+    {
+      "id": 38,
+      "storeId": 4,
+      "name": "包包P",
+      "brand": "Coach",
+      "category": "bags",
+      "subCategory": "male",
+      "price": 4100,
+      "views": 112
+    },
+    {
+      "id": 39,
+      "storeId": 5,
+      "name": "玩偶J",
+      "brand": "Disney",
+      "category": "dolls",
+      "subCategory": "others",
+      "price": 1110,
+      "views": 122
+    },
+    {
+      "id": 40,
+      "storeId": 1,
+      "name": "玩偶K",
+      "brand": "Sanrio",
+      "category": "dolls",
+      "subCategory": "sunrio",
+      "price": 890,
+      "views": 105
+    },
+    {
+      "id": 41,
+      "storeId": 2,
+      "name": "玩偶L",
+      "brand": "Chiikawa",
+      "category": "dolls",
+      "subCategory": "chiikawa",
+      "price": 940,
+      "views": 86
+    },
+    {
+      "id": 42,
+      "storeId": 3,
+      "name": "衣服N",
+      "brand": "Zara",
+      "category": "clothes",
+      "subCategory": "male",
+      "price": 1240,
+      "views": 57
+    },
+    {
+      "id": 43,
+      "storeId": 4,
+      "name": "衣服O",
+      "brand": "Uniqlo",
+      "category": "clothes",
+      "subCategory": "female",
+      "price": 970,
+      "views": 68
+    },
+    {
+      "id": 44,
+      "storeId": 5,
+      "name": "衣服P",
+      "brand": "GU",
+      "category": "clothes",
+      "subCategory": "unisex",
+      "price": 1400,
+      "views": 93
+    },
+    {
+      "id": 45,
+      "storeId": 1,
+      "name": "包包Q",
+      "brand": "Gucci",
+      "category": "bags",
+      "subCategory": "female",
+      "price": 6850,
+      "views": 188
+    },
+    {
+      "id": 46,
+      "storeId": 2,
+      "name": "包包R",
+      "brand": "Nike",
+      "category": "bags",
+      "subCategory": "accessories",
+      "price": 2450,
+      "views": 81
+    },
+    {
+      "id": 47,
+      "storeId": 3,
+      "name": "包包S",
+      "brand": "Adidas",
+      "category": "bags",
+      "subCategory": "male",
+      "price": 3100,
+      "views": 101
+    },
+    {
+      "id": 48,
+      "storeId": 4,
+      "name": "包包T",
+      "brand": "Prada",
+      "category": "bags",
+      "subCategory": "female",
+      "price": 7150,
+      "views": 176
+    },
+    {
+      "id": 49,
+      "storeId": 5,
+      "name": "玩偶M",
+      "brand": "Bandai",
+      "category": "dolls",
+      "subCategory": "others",
+      "price": 1050,
+      "views": 110
+    },
+    {
+      "id": 50,
+      "storeId": 1,
+      "name": "玩偶N",
+      "brand": "Sanrio",
+      "category": "dolls",
+      "subCategory": "sunrio",
+      "price": 860,
+      "views": 101
+    }
+  ],
+  "orders": [
+    {
+      "id": "60ff",
+      "items": [
+        {
+          "name": "玩偶K",
+          "brand": "Sanrio",
+          "price": 890
+        },
+        {
+          "name": "玩偶I",
+          "brand": "Chiikawa",
+          "price": 1020
+        }
+      ],
+      "total": 1910,
+      "createdAt": "2025/5/13 下午3:22:52"
+    }
+  ]
+}
