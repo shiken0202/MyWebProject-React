@@ -1,10 +1,12 @@
 import { Navbar, Nav, NavDropdown, Container, Form, FormControl, Button,Stack } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useEffect ,useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 function MyNavbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username,setUsername]=useState("");
   const [role,setRole]=useState('');
+   const navigate=useNavigate();
   useEffect(() => {
     checkLogin();
     fetchUserInfo();
@@ -31,6 +33,7 @@ function MyNavbar() {
      if (res.ok && resData.status === 200) {
         alert(resData.message);
         setIsLoggedIn(false);
+         navigate('/');
       } else {
         alert('登出失敗：' + resData.message);
       }
