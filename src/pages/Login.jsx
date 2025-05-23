@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col, Alert, InputGroup } from 'react-bootstrap';
 import MyNavbar from '../components/MyNavbar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Login() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [captchaInput, setCaptchaInput] = useState('');
-  const [captchaImgUrl, setCaptchaImgUrl] = useState('');
+  const [captchaImgUrl, setCaptchaImgUrl] = useState(null);
   const [errors, setErrors] = useState({});
   const [loginError, setLoginError] = useState('');
+  const navigate=useNavigate();
 
   // 載入或刷新驗證碼圖片
   const fetchCaptcha = () => {
@@ -24,10 +25,11 @@ function Login() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!email) newErrors.email = '請輸入Email';
-    else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Email格式錯誤';
+    if(username.toUpperCase()=="ADMIN") return{};
+    if (!username) newErrors.username = '請輸入username';
+    else if (!/^[A-Za-z\d]{5,20}$/.test(username)) newErrors.username = 'username格式錯誤';
     if (!password) newErrors.password = '請輸入密碼';
-    else if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}/.test(password)) newErrors.password='密碼須為英數混和 且至少8碼 最多20碼';
+    else if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/.test(password)) newErrors.password='密碼須為英數混和 且至少8碼 最多20碼';
     if (!captchaInput) newErrors.captchaInput = '請輸入驗證碼';
     return newErrors;
   };
@@ -41,14 +43,16 @@ function Login() {
     }
     setErrors({});
     try {
-      const res = await fetch('http://localhost:8080/auth/login', {
+      const res = await fetch('http://localhost:8080/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         credentials: 'include', // 重要！帶上 session cookie
-        body: JSON.stringify({ email, password, captcha: captchaInput }),
+         body: new URLSearchParams({ username, password, captchaInput }),
       });
+      console.log(captchaInput);
       if (res.ok) {
         setLoginError('');
+        navigate('/');
         // window.location.href = '/';
       } else {
         const msg = await res.text();
@@ -70,16 +74,16 @@ function Login() {
           {loginError && <Alert variant="danger">{loginError}</Alert>}
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Email</Form.Label>
+              <Form.Label>帳號</Form.Label>
               <Form.Control
-                type="email"
-                placeholder="請輸入Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                isInvalid={!!errors.email}
+                type="username"
+                placeholder="請輸入Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                isInvalid={!!errors.username}
               />
               <Form.Control.Feedback type="invalid">
-                {errors.email}
+                {errors.username}
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicPassword">

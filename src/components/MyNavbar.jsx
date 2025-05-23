@@ -1,15 +1,66 @@
-import { Navbar, Nav, NavDropdown, Container, Form, FormControl, Button } from 'react-bootstrap';
+import { Navbar, Nav, NavDropdown, Container, Form, FormControl, Button,Stack } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-
+import { useEffect ,useState} from 'react';
 function MyNavbar() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username,setUsername]=useState("");
+  const [role,setRole]=useState('');
+  useEffect(() => {
+    checkLogin();
+    fetchUserInfo();
+  }, [])
+  const checkLogin=async()=>{
+    try{
+      const res=await fetch("http://localhost:8080/check-login",{
+        method:'GET',
+        credentials:'include'
+      });
+      const resData=await res.json();
+      setIsLoggedIn(resData.data);
+    }catch(err){
+      setIsLoggedIn(false);
+    } 
+  };
+  const Logout=async()=>{
+    try{
+      const res=await fetch("http://localhost:8080/logout",{
+        method:'GET',
+        credentials:'include'
+      });
+      const resData=await res.json();
+     if (res.ok && resData.status === 200) {
+        alert(resData.message);
+        setIsLoggedIn(false);
+      } else {
+        alert('登出失敗：' + resData.message);
+      }
+    } catch (err) {
+      alert('登出錯誤: ' + err.message);
+    }
+  };
+  const fetchUserInfo=async()=>{
+  try{
+    const res=await fetch("http://localhost:8080/userinfo",{
+      method:'GET',
+      credentials:'include'
+    });
+    const resData=await res.json();
+    console.log(resData);
+    setUsername(resData.data.userName);
+    setRole(resData.data.role);
+  }catch(err){
+
+  }    
+  }
+  const roleMap={ADMIN:"管理員",BUYER:"買家",SELLER:"賣家"};
   return (
     <Navbar expand="lg" className="navbar" fixed='top' data-bs-theme="light" style={{ backgroundColor: '#e3f2fd' }}>
       <Container fluid>
         <Navbar.Brand as={Link} to="/">網頁名稱</Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarScroll" />
         <Navbar.Collapse id="navbarScroll">
-          {/* 左側導覽項目 */}
-          <Nav className="me-auto my-2 my-lg-0">
+          {/* 左側導覽項目 */}     
+            <Nav className="me-auto my-2 my-lg-0">       
             <NavDropdown title="衣服" id="clothes-nav-dropdown">
               <NavDropdown.Item as={Link} to="/products/clothes/male">男裝</NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/products/clothes/female">女裝</NavDropdown.Item>
@@ -28,14 +79,38 @@ function MyNavbar() {
               <NavDropdown.Divider />
               <NavDropdown.Item as={Link} to="/products/dolls/others">其他</NavDropdown.Item>
             </NavDropdown>
-              <Nav.Link href="/user/collect">💗收藏賣場</Nav.Link>
-              <Nav.Link href="/user/myorder">📋我的訂單</Nav.Link>
-              <Nav.Link href="/user/myproduct">🌸我的賣場</Nav.Link>
+            
+              {isLoggedIn&&(
+                <>
+                <Nav.Link href="/user/collect">💗收藏賣場</Nav.Link>
+                <Nav.Link href="/user/myorder">📋我的訂單</Nav.Link>
+                <Nav.Link href="/user/myproduct">🌸我的賣場</Nav.Link>
+              </>
+               
+              )}
+              
+             
           </Nav>
+          
+            
           {/* 右側按鈕區塊 */}
           <div className="d-flex">
+            {isLoggedIn
+            ?<Stack direction="horizontal" gap={3}> 
+            <div className="p-2 ms-auto">
+              {`${roleMap[role]}\u00A0\u00A0:\u00A0\u00A0\u00A0${username}`}
+            </div>
+            <div className="vr m-2" />
+            </Stack>
+            :""
+            }
             <Button variant="outline-warning" as={Link} to="/products/user/cart" className="me-2">🛒 購物車</Button>
+            {isLoggedIn
+            ?
+            <Button variant="outline-primary" onClick={Logout} className="me-3">👤 會員登出</Button>
+            :
             <Button variant="outline-primary" as={Link} to="/login" className="me-3">👤 會員登入</Button>
+            }
           </div>
         </Navbar.Collapse>
         <Form className="d-flex me-3">
