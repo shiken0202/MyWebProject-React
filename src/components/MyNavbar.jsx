@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 function MyNavbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username,setUsername]=useState("");
+  const [emailchcek,setEmailcheck]=useState(false);
   const [role,setRole]=useState('');
    const navigate=useNavigate();
   useEffect(() => {
@@ -51,9 +52,18 @@ function MyNavbar() {
     console.log(resData);
     setUsername(resData.data.userName);
     setRole(resData.data.role);
+    setEmailcheck(resData.data.emailcheck)  
   }catch(err){
 
   }    
+  }
+  const EmailchcekHandler=(e,path)=>{
+    if(!emailchcek){
+      alert('請先驗證Email')
+      navigate('/');
+    }else{
+      navigate(path)
+    }
   }
   const roleMap={ADMIN:"管理員",BUYER:"買家",SELLER:"賣家"};
   return (
@@ -85,9 +95,19 @@ function MyNavbar() {
             
               {isLoggedIn&&(
                 <>
-                <Nav.Link href="/user/collect">💗收藏賣場</Nav.Link>
-                <Nav.Link href="/user/myorder">📋我的訂單</Nav.Link>
-                <Nav.Link href="/user/myproduct">🌸我的賣場</Nav.Link>
+                  <Nav.Link  as={Link} to="/user/collect"  onClick={(e,) => {
+                     e.preventDefault();
+                    EmailchcekHandler(e,"/user/collect"); 
+                  }}>💗收藏賣場
+                  </Nav.Link>
+                <Nav.Link as={Link} to="/user/myorder" onClick={(e) => {
+                   e.preventDefault();
+                    EmailchcekHandler(e,"/user/myorder"); 
+                  }}>📋我的訂單</Nav.Link>
+                <Nav.Link as={Link} to="/user/myproduct"onClick={(e) => {
+                   e.preventDefault();
+                    EmailchcekHandler(e,"/user/myproduct"); 
+                  }}>🌸我的賣場</Nav.Link>
               </>
                
               )}

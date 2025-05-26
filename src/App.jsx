@@ -7,6 +7,7 @@ import ProductDetailPage from './pages/ProductDetailPage'
 import Collect from './pages/Collect'
 import OrderList from './pages/OrderList'
 import MyProduct from './pages/MyProduct';
+import Register from './pages/Register';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/user/collect" element={<Collect />} />
         <Route path="/user/myorder" element={<OrderList />} />
         <Route path="/user/myproduct" element={<MyProduct />} />
+        <Route path="/register" element={<Register />} />
         <Route path="*" element={<Navigate to="/" replace />} />
         {/* 可持續擴充更多路由 */}
       </Routes>
