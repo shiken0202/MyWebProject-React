@@ -12,7 +12,7 @@ function ProductCard({ product }) {
       <Card.Body>
         <Card.Title>{product.name}</Card.Title>
         <Card.Subtitle className="mb-2 text-muted">{product.brand}</Card.Subtitle>
-        <Card.Img variant="top" src="https://fakeimg.pl/440x320/" />
+        <Card.Img variant="top" src="https://www.shutterstock.com/shutterstock/photos/2176889757/display_1500/stock-photo-close-up-hand-carry-choose-zero-pork-soy-bean-faux-peas-cutlet-gluten-free-read-beyond-non-meat-lab-2176889757.jpg" />
         <Card.Text>
           分類：{titleMap[product.category]?.[product.subCategory]}<br />
           價格：${product.price} <br />

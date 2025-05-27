@@ -49,7 +49,6 @@ function MyNavbar() {
       credentials:'include'
     });
     const resData=await res.json();
-    console.log(resData);
     setUsername(resData.data.userName);
     setRole(resData.data.role);
     setEmailcheck(resData.data.emailcheck)  
@@ -64,6 +63,31 @@ function MyNavbar() {
     }else{
       navigate(path)
     }
+  }
+   const rolelink=()=>{
+    switch(role){
+      case "BUYER": return null;
+      case "SELLER":
+              return (
+                  <Nav.Link as={Link} to="/user/myproduct"onClick={(e) => {
+                   e.preventDefault();
+                    EmailchcekHandler(e,"/user/myproduct"); 
+                  }}>🌸我的賣場</Nav.Link>)
+      case "ADMIN":return (<>
+                    <Nav.Link as={Link} to="/user/myproduct"onClick={(e) => {
+                      e.preventDefault();
+                      EmailchcekHandler(e,"/user/myproduct"); 
+                      }}>🌸商品管理
+                    </Nav.Link>
+                    <Nav.Link as={Link} to="/user/userlist"onClick={(e) => {
+                      e.preventDefault();
+                      EmailchcekHandler(e,"/user/userlist"); 
+                      }}>🌸使用者管理
+                    </Nav.Link>
+                  </>  
+                )
+                  
+    } 
   }
   const roleMap={ADMIN:"管理員",BUYER:"買家",SELLER:"賣家"};
   return (
@@ -100,14 +124,16 @@ function MyNavbar() {
                     EmailchcekHandler(e,"/user/collect"); 
                   }}>💗收藏賣場
                   </Nav.Link>
-                <Nav.Link as={Link} to="/user/myorder" onClick={(e) => {
+                  {
+                    role!="ADMIN"?<Nav.Link as={Link} to="/user/myorder" onClick={(e) => {
                    e.preventDefault();
                     EmailchcekHandler(e,"/user/myorder"); 
-                  }}>📋我的訂單</Nav.Link>
-                <Nav.Link as={Link} to="/user/myproduct"onClick={(e) => {
-                   e.preventDefault();
-                    EmailchcekHandler(e,"/user/myproduct"); 
-                  }}>🌸我的賣場</Nav.Link>
+                  }}>📋我的訂單</Nav.Link>:""
+                  }
+                  {
+                    rolelink(role)
+                  }
+                
               </>
                
               )}
@@ -127,7 +153,10 @@ function MyNavbar() {
             </Stack>
             :""
             }
-            <Button variant="outline-warning" as={Link} to="/products/user/cart" className="me-2">🛒 購物車</Button>
+            {
+              role=="BUYER"?<Button variant="outline-warning" as={Link} to="/products/user/cart" className="me-2">🛒 購物車</Button>
+              :""
+            }
             {isLoggedIn
             ?
             <Button variant="outline-primary" onClick={Logout} className="me-3">👤 會員登出</Button>

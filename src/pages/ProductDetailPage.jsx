@@ -40,7 +40,7 @@ function ProductDetailPage() {
                             />
                         ))
                         ) : (
-                        <img src="https://fakeimg.pl/300x200/" alt="無圖片" style={{width:"100%"}} />
+                        <img src="https://www.shutterstock.com/shutterstock/photos/2176889757/display_1500/stock-photo-close-up-hand-carry-choose-zero-pork-soy-bean-faux-peas-cutlet-gluten-free-read-beyond-non-meat-lab-2176889757.jpg" alt="無圖片" style={{width:"100%"}} />
                         )}</Col>
                 <Col xs={12}md={6} lg={6}>
                     <h2>{product.name}</h2>

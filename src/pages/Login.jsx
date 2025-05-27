@@ -49,14 +49,13 @@ function Login() {
         credentials: 'include', // 重要！帶上 session cookie
          body: new URLSearchParams({ username, password, captchaInput }),
       });
-      console.log(captchaInput);
       if (res.ok) {
         setLoginError('');
         navigate('/');
         // window.location.href = '/';
       } else {
         const msg = await res.text();
-        setLoginError(msg || '登入失敗，請檢查帳號密碼或驗證碼');
+        setLoginError('登入失敗，請檢查帳號密碼或驗證碼'|| msg );
         fetchCaptcha(); // 登入失敗時刷新驗證碼
       }
     } catch (err) {

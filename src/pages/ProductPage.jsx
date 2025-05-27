@@ -8,24 +8,12 @@ import { useParams ,Link} from 'react-router-dom';
 function ProductPage() {
   // 狀態與資料
   const [products, setProducts] = useState([]);
-  // const [category,setCategory] =useState([]);
-  // const [subCategories, setSubCategories] = useState([]);
-  // const [selectedSub, setSelectedSub] = useState('');
-  // const pathname = window.location.pathname;
-  // const urlParameter =pathname.split("/");
-  // urlParameter[3]
   const{main,sub}=useParams();
-  // 取得商品資料
   useEffect(() => {
     fetch("http://localhost:3000/products")
       .then(res => res.json())
       .then(data => {
         setProducts(data);
-        // 取得所有子分類
-        // setCategory(["clothes","bags","dolls"]);
-        // const subs = Array.from(new Set(data.map(p => p.subCategory)));
-        // setSubCategories(subs);
-        // setSelectedSub(subs[0] || '');
       })
       .catch(err => {
         console.log("載入失敗", err);
