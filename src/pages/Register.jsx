@@ -1,35 +1,46 @@
-import React, { useState } from 'react';
-import { Form, Button, Container, Row, Col, Alert, ButtonGroup } from 'react-bootstrap';
-import MyNavbar from '../components/MyNavbar';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import {
+  Form,
+  Button,
+  Container,
+  Row,
+  Col,
+  Alert,
+  ButtonGroup,
+} from "react-bootstrap";
+import MyNavbar from "../components/MyNavbar";
+import { Link, useNavigate } from "react-router-dom";
 
 function Register() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [email, setEmail] = useState('');
-  const [role, setRole] = useState(''); // 新增角色狀態
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState(""); // 新增角色狀態
   const [errors, setErrors] = useState({});
-  const [registerError, setRegisterError] = useState('');
+  const [registerError, setRegisterError] = useState("");
   const navigate = useNavigate();
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (username.toUpperCase() === "ADMIN") return {};
-    if (!username) newErrors.username = '請輸入 username';
-    else if (!/^[A-Za-z\d]{5,20}$/.test(username)) newErrors.username = 'username 格式錯誤（限英文數字，5-20字）';
+    if (!username) newErrors.username = "請輸入 username";
+    else if (!/^[A-Za-z\d]{5,20}$/.test(username))
+      newErrors.username = "username 格式錯誤（限英文數字，5-20字）";
 
-    if (!email) newErrors.email = '請輸入電子郵件';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = '電子郵件格式錯誤';
+    if (!email) newErrors.email = "請輸入電子郵件";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      newErrors.email = "電子郵件格式錯誤";
 
-    if (!password) newErrors.password = '請輸入密碼';
-    else if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/.test(password)) newErrors.password = '密碼須為英數混和，8-20字';
+    if (!password) newErrors.password = "請輸入密碼";
+    else if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/.test(password))
+      newErrors.password = "密碼須為英數混和，8-20字";
 
-    if (password !== confirmPassword) newErrors.confirmPassword = '密碼不一致';
+    if (password !== confirmPassword) newErrors.confirmPassword = "密碼不一致";
 
     // 新增角色驗證
-    if (!role) newErrors.role = '請選擇身份';
+    if (!role) newErrors.role = "請選擇身份";
 
     return newErrors;
   };
@@ -37,36 +48,36 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formErrors = validateForm();
-    
+
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
       return;
     }
-    
+
     setErrors({});
-    
+
     try {
-      const res = await fetch('http://localhost:8080/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ 
-          username, 
-          password, 
+      const res = await fetch("http://localhost:8080/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          username,
+          password,
           email,
-          role // 加入角色參數
+          role, // 加入角色參數
         }),
       });
 
       if (res.ok) {
-        setRegisterError('');
-        alert('註冊成功！將導向登入頁面');
-        navigate('/login');
+        setRegisterError("");
+        alert("註冊成功！將導向登入頁面，認證Email已發至信箱。");
+        navigate("/login");
       } else {
         const errorData = await res.json();
-        setRegisterError(errorData.message || '註冊失敗，請檢查輸入資訊');
+        setRegisterError(errorData.message || "註冊失敗，請檢查輸入資訊");
       }
     } catch (err) {
-      setRegisterError('伺服器錯誤，請稍後再試');
+      setRegisterError("伺服器錯誤，請稍後再試");
     }
   };
 
@@ -76,7 +87,7 @@ function Register() {
       <Row className="justify-content-md-center mt-5">
         <Col xs={12} md={6}>
           <h2 className="text-center mb-4">會員註冊</h2>
-          
+
           {registerError && <Alert variant="danger">{registerError}</Alert>}
 
           <Form onSubmit={handleSubmit}>
@@ -85,21 +96,23 @@ function Register() {
               <Form.Label>身份選擇</Form.Label>
               <ButtonGroup className="w-100">
                 <Button
-                  variant={role === 'BUYER' ? 'primary' : 'outline-primary'}
-                  onClick={() => setRole('BUYER')}
-                  active={role === 'BUYER'}
+                  variant={role === "BUYER" ? "primary" : "outline-primary"}
+                  onClick={() => setRole("BUYER")}
+                  active={role === "BUYER"}
                 >
                   我是買家
                 </Button>
                 <Button
-                  variant={role === 'SELLER' ? 'primary' : 'outline-primary'}
-                  onClick={() => setRole('SELLER')}
-                  active={role === 'SELLER'}
+                  variant={role === "SELLER" ? "primary" : "outline-primary"}
+                  onClick={() => setRole("SELLER")}
+                  active={role === "SELLER"}
                 >
                   我是賣家
                 </Button>
               </ButtonGroup>
-              {errors.role && <div className="text-danger mt-1">{errors.role}</div>}
+              {errors.role && (
+                <div className="text-danger mt-1">{errors.role}</div>
+              )}
             </Form.Group>
 
             {/* 原有表單欄位保持不變 */}
