@@ -15,22 +15,32 @@ function MyProduct() {
   const [selectedMainCategory, setSelectedMainCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [showEditProductModal, setShowEditProductModal] = useState(false);
   const [newProductName, setNewProductName] = useState("");
   const [newProductBrand, setNewProductBrand] = useState("");
   const [newProductPrice, setNewProductPrice] = useState("");
   const [newProductStock, setNewProductStock] = useState("");
   const [newProductDescription, setNewProductDescription] = useState("");
+  const [editProductId, setEditProductId] = useState(null);
+  const [editProductName, setEditProductName] = useState("");
+  const [editProductBrand, setEditProductBrand] = useState("");
+  const [editProductPrice, setEditProductPrice] = useState("");
+  const [editProductStock, setEditProductStock] = useState("");
+  const [editProductDescription, setEditProductDescription] = useState("");
   const [isActive, setIsActive] = useState(false);
   const [editDescription, setEditDescription] = useState("");
   const { userId, username, emailcheck, role } = useUser();
-  const navigate = useNavigate();
   console.log(userId);
   console.log(username);
   useEffect(() => {
-    fetchProducts();
     fetchStoreInfo();
     fetchMainCategories();
   }, []);
+  useEffect(() => {
+    if (storeInfo) {
+      fetchProducts();
+    }
+  }, [storeInfo]);
   const fetchMainCategories = async () => {
     try {
       const res = await fetch("http://localhost:8080/category/main", {
@@ -51,6 +61,8 @@ function MyProduct() {
         { method: "GET", credentials: "include" }
       );
       const resData = await res.json();
+      console.log(resData);
+
       setSubCategories(resData.data);
     } catch (error) {
       console.error("載入子分類失敗:", error);
@@ -69,9 +81,12 @@ function MyProduct() {
   };
   const fetchProducts = async () => {
     try {
-      const response = await fetch("http://localhost:3000/products");
-      const data = await response.json();
-      setProducts(data);
+      const res = await fetch(
+        `http://localhost:8080/products/store/${storeInfo.id}`
+      );
+      const resData = await res.json();
+      console.log(resData);
+      setProducts(resData.data);
     } catch (error) {
       console.error("取得商品失敗:", error);
     }
@@ -85,10 +100,8 @@ function MyProduct() {
     setStoreInfo(resData.data);
     console.log(resData);
   };
-  console.log(storeInfo);
   const createStore = async (e) => {
-    e.preventDefault(); // 防止頁面重整
-
+    e.preventDefault();
     // 前端驗證
     if (!storeName.trim()) {
       alert("請輸入商店名稱");
@@ -98,7 +111,6 @@ function MyProduct() {
       alert("請輸入商店描述");
       return;
     }
-
     try {
       const res = await fetch("http://localhost:8080/store/create", {
         method: "POST",
@@ -122,14 +134,17 @@ function MyProduct() {
       alert("伺服器錯誤，請稍後再試");
     }
   };
+
   const handleStoreEditClick = () => {
     setEditDescription(storeInfo.description);
     setShowEditModal(true);
   };
+
   const handleStoreCloseModal = () => {
     setShowEditModal(false);
     setEditDescription("");
   };
+
   const handleStoreEditSubmit = async (e) => {
     e.preventDefault();
     if (!editDescription.trim()) {
@@ -146,7 +161,6 @@ function MyProduct() {
           description: editDescription,
         }),
       });
-
       if (res.ok) {
         alert("商店資訊更新成功！");
         setShowEditModal(false);
@@ -159,11 +173,144 @@ function MyProduct() {
       alert("伺服器錯誤，請稍後再試");
     }
   };
+  const handleProductAddSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("http://localhost:8080/product/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          storeId: storeInfo.id,
+          title: newProductName,
+          brand: newProductBrand,
+          categoryId: selectedSubCategory,
+          price: newProductPrice,
+          stock: newProductStock,
+          description: newProductDescription,
+        }),
+      });
+      if (res.ok) {
+        alert("商品新增成功！");
+        setNewProductName("");
+        setNewProductBrand("");
+        setSelectedMainCategory("");
+        setSelectedSubCategory("");
+        setNewProductPrice("");
+        setNewProductStock("");
+        setNewProductDescription("");
+        setShowAddProductModal(false);
+        fetchProducts();
+      } else {
+        const errorData = await res.json();
+        alert(errorData.message || "新增失敗");
+      }
+    } catch (error) {
+      alert("伺服器錯誤，請稍後再試");
+    }
+  };
   const handleProductAddClick = () => {
     setShowAddProductModal(true);
   };
+  const handleProductEditClick = (product) => {
+    setShowEditProductModal(true);
+    setEditProductId(product.id);
+    setEditProductName(product.title);
+    setEditProductBrand(product.brand);
+    setEditProductPrice(product.price);
+    setEditProductStock(product.stock);
+    setEditProductDescription(product.description);
+  };
   const handleProductCloseModal = () => {
     setShowAddProductModal(false);
+  };
+  const handleProductEditCloseModal = () => {
+    setSelectedMainCategory("");
+    setSelectedSubCategory("");
+    setShowEditProductModal(false);
+  };
+  const handleProductEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!editProductName.trim()) {
+      alert("請輸入商品名稱");
+      return;
+    }
+    if (!editProductPrice || Number(editProductPrice) <= 0) {
+      alert("請輸入有效價格");
+      return;
+    }
+    if (!editProductStock || Number(editProductStock) < 0) {
+      alert("請輸入有效庫存");
+      return;
+    }
+    try {
+      const res = await fetch(
+        `http://localhost:8080/product/edit/${editProductId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            title: editProductName,
+            brand: editProductBrand,
+            categoryId: selectedSubCategory,
+            price: editProductPrice,
+            stock: editProductStock,
+            description: editProductDescription,
+          }),
+        }
+      );
+      if (res.ok) {
+        alert("商品修改成功！");
+        setShowEditProductModal(false);
+        setSelectedMainCategory("");
+        setSelectedSubCategory("");
+        fetchProducts();
+      } else {
+        const errorData = await res.json();
+        alert(errorData.message || "新增失敗");
+      }
+    } catch (error) {
+      alert("伺服器錯誤，請稍後再試");
+    }
+  };
+  const handleProductDelete = async (productId) => {
+    const isConfirmed = window.confirm("是否確定要刪除這個商品？");
+    if (!isConfirmed) {
+      return;
+    }
+    try {
+      const res = await fetch(
+        `http://localhost:8080/product/delete/${productId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (res.ok) {
+        alert("刪除成功");
+        fetchProducts();
+      } else {
+        const errorData = await res.json();
+        alert(errorData.message || "刪除失敗，請稍後再試。");
+      }
+    } catch (error) {
+      alert("伺服器錯誤，請稍後再試。");
+    }
+  };
+  const subCategoryNameMap = {
+    male: "男用",
+    female: "女用",
+    unisex: "中性",
+    accessories: "配件",
+    chiikawa: "吉伊卡哇",
+    sunrio: "三麗鷗",
+    others: "其他",
+  };
+  const titleMap = {
+    clothes: "衣服",
+    bags: "包包",
+    dolls: "玩偶",
   };
   return (
     <>
@@ -246,6 +393,7 @@ function MyProduct() {
                   </Modal.Footer>
                 </Form>
               </Modal>
+              {/*新增商品表單*/}
               <Modal
                 show={showAddProductModal}
                 onHide={handleProductCloseModal}
@@ -253,7 +401,7 @@ function MyProduct() {
                 <ModalHeader closeButton>
                   <ModalTitle>新增商品</ModalTitle>
                 </ModalHeader>
-                <Form onSubmit={""}>
+                <Form onSubmit={handleProductAddSubmit}>
                   <ModalBody>
                     <Form.Group className="mb-3">
                       <Form.Label>商品名稱:</Form.Label>
@@ -287,7 +435,7 @@ function MyProduct() {
                         <option value="">請選擇主分類</option>
                         {mainCategories.map((category) => (
                           <option key={category.id} value={category.id}>
-                            {category.name}
+                            {titleMap[category.name]}
                           </option>
                         ))}
                       </Form.Select>
@@ -306,7 +454,7 @@ function MyProduct() {
                         <option value="">請選擇子分類</option>
                         {subCategories.map((category) => (
                           <option key={category.id} value={category.id}>
-                            {category.name}
+                            {subCategoryNameMap[category.name]}
                           </option>
                         ))}
                       </Form.Select>
@@ -370,6 +518,131 @@ function MyProduct() {
                   </Modal.Footer>
                 </Form>
               </Modal>
+              {/*修改商品表單*/}
+              <Modal
+                show={showEditProductModal}
+                onHide={handleProductEditCloseModal}
+              >
+                <ModalHeader closeButton>
+                  <ModalTitle>修改商品</ModalTitle>
+                </ModalHeader>
+                <Form onSubmit={handleProductEditSubmit}>
+                  <ModalBody>
+                    <Form.Group className="mb-3">
+                      <Form.Label>商品名稱:</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="請輸入商品名稱"
+                        value={editProductName}
+                        onChange={(e) => setEditProductName(e.target.value)}
+                        required
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>品牌</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="請輸入品牌名稱"
+                        value={editProductBrand}
+                        onChange={(e) => setEditProductBrand(e.target.value)}
+                      />
+                    </Form.Group>
+                    {/* 主分類選擇 */}
+                    <Form.Group className="mb-3">
+                      <Form.Label>
+                        主分類 <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Select
+                        value={selectedMainCategory}
+                        onChange={handleMainCategoryChange}
+                        required
+                      >
+                        <option value="">請選擇主分類</option>
+                        {mainCategories.map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {titleMap[category.name]}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </Form.Group>
+                    {/* 子分類選擇 */}
+                    <Form.Group className="mb-3">
+                      <Form.Label>
+                        子分類 <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Select
+                        value={selectedSubCategory}
+                        onChange={(e) => setSelectedSubCategory(e.target.value)}
+                        disabled={!selectedMainCategory}
+                        required
+                      >
+                        <option value="">請選擇子分類</option>
+                        {subCategories.map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {subCategoryNameMap[category.name]}
+                          </option>
+                        ))}
+                      </Form.Select>
+                      {!selectedMainCategory && (
+                        <Form.Text className="text-muted">
+                          請先選擇主分類
+                        </Form.Text>
+                      )}
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>
+                        價格 <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Control
+                        type="number"
+                        step="1"
+                        min="0"
+                        placeholder="請輸入商品價格"
+                        value={editProductPrice}
+                        onChange={(e) => setEditProductPrice(e.target.value)}
+                        required
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>
+                        庫存數量 <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Control
+                        type="number"
+                        min="0"
+                        placeholder="請輸入庫存數量"
+                        value={editProductStock}
+                        onChange={(e) => setEditProductStock(e.target.value)}
+                        required
+                      />
+                    </Form.Group>
+                    {/* 商品描述 */}
+                    <Form.Group className="mb-3">
+                      <Form.Label>商品描述</Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        rows={3}
+                        placeholder="請輸入商品描述"
+                        value={editProductDescription}
+                        onChange={(e) =>
+                          setEditProductDescription(e.target.value)
+                        }
+                      />
+                    </Form.Group>
+                  </ModalBody>
+                  <Modal.Footer>
+                    <Button
+                      variant="secondary"
+                      onClick={handleProductEditCloseModal}
+                    >
+                      取消
+                    </Button>
+                    <Button variant="primary" type="submit">
+                      修改商品
+                    </Button>
+                  </Modal.Footer>
+                </Form>
+              </Modal>
               <p />
               <Button variant="primary" onClick={handleProductAddClick}>
                 新增商品
@@ -393,19 +666,27 @@ function MyProduct() {
               <tbody>
                 {products.map((product) => (
                   <tr key={product.id}>
-                    <td>{product.name}</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>{product.title}</td>
+                    <td>{product.brand}</td>
+                    <td>{subCategoryNameMap[product.categoryName]}</td>
                     <td>${product.price}</td>
                     <td>{product.stock}</td>
                     <td>{product.description}</td>
                     <td>{}</td>
+                    <td>{product.isActive ? "上架中" : "已下架"}</td>
                     <td>
-                      <Button variant="warning" className="me-2">
+                      <Button
+                        variant="warning"
+                        className="me-2"
+                        onClick={() => handleProductEditClick(product)}
+                      >
                         編輯
                       </Button>
-                      <Button variant="danger" className="me-3">
+                      <Button
+                        variant="danger"
+                        className="me-3"
+                        onClick={() => handleProductDelete(product.id)}
+                      >
                         刪除
                       </Button>
                       <Button variant="outline-secondary" className="me-3">
