@@ -399,9 +399,22 @@ function MyProduct() {
       alert("伺服器錯誤，請稍後再試");
     }
   };
+  const categoriesIdMap = {
+    2: 1,
+    3: 1,
+    4: 1,
+    6: 5,
+    7: 5,
+    8: 5,
+    10: 9,
+    11: 9,
+    12: 9,
+  };
+  const categoriesMainMap = { 1: "衣服", 5: "包包", 9: "玩偶" };
+
   const subCategoryNameMap = {
-    male: "男用",
-    female: "女用",
+    male: "男",
+    female: "女",
     unisex: "中性",
     accessories: "配件",
     chiikawa: "吉伊卡哇",
@@ -809,7 +822,11 @@ function MyProduct() {
                   <tr key={product.id}>
                     <td>{product.title}</td>
                     <td>{product.brand}</td>
-                    <td>{subCategoryNameMap[product.categoryName]}</td>
+                    <td>
+                      {categoriesMainMap[categoriesIdMap[product.categoryId]] +
+                        ";" +
+                        subCategoryNameMap[product.categoryName]}
+                    </td>
                     <td>${product.price}</td>
                     <td>{product.stock}</td>
                     <td>{product.description}</td>

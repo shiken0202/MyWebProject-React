@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
+import { CategoryProvider, useCategory } from "./context/CategoryContext";
 import HomePage from "./pages/HomePage";
 import Cart from "./pages/Cart";
 import Login from "./pages/Login";
@@ -14,20 +15,22 @@ function App() {
   return (
     <BrowserRouter>
       <UserProvider>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/products/user/cart" element={<Cart />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/products/:main/:sub" element={<ProductPage />} />
-          <Route path="/product/:id" element={<ProductDetailPage />} />
-          <Route path="/user/collect" element={<Collect />} />
-          <Route path="/user/myorder" element={<OrderList />} />
-          <Route path="/user/myproduct" element={<MyProduct />} />
-          <Route path="/user/userlist" element={<UserList />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-          {/* 可持續擴充更多路由 */}
-        </Routes>
+        <CategoryProvider>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/products/user/cart" element={<Cart />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/products/:main/:sub" element={<ProductPage />} />
+            <Route path="/product/:id" element={<ProductDetailPage />} />
+            <Route path="/user/collect" element={<Collect />} />
+            <Route path="/user/myorder" element={<OrderList />} />
+            <Route path="/user/myproduct" element={<MyProduct />} />
+            <Route path="/user/userlist" element={<UserList />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* 可持續擴充更多路由 */}
+          </Routes>
+        </CategoryProvider>
       </UserProvider>
     </BrowserRouter>
   );

@@ -3,27 +3,15 @@ import MyNavbar from "../components/MyNavbar";
 import ProductCard from "../components/ProductCard";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useCategory } from "../context/CategoryContext";
 
 function HomePage() {
   const [products, setProducts] = useState([]);
-  const [category, setCategory] = useState([]);
-  const [subCategory, setSubCategory] = useState([]);
-  const [views, setViews] = useState("");
+  const { categories, mainCategories, subCategories } = useCategory();
   useEffect(() => {
     fetchProducts();
-    fetchCategories();
-    fetch("http://localhost:8080/products")
-      .then((res) => res.json())
-      .then((data) => {
-        setProducts(data);
-        console.log(products);
-        setCategory([...new Set(data.map((p) => p.category))]);
-        // setCategory(data.map(d=>d.category));
-        setSubCategory(...new Set(data.map((p) => p.subCategory)));
-        console.log(res.json());
-      })
-      .catch((err) => console.log("載入失敗", err));
   }, []);
+
   const fetchProducts = async () => {
     const res = await fetch("http://localhost:8080/products", {
       method: "GET",
@@ -31,33 +19,58 @@ function HomePage() {
     });
     if (res.ok) {
       const resData = await res.json();
-      console.log(resData);
+      setProducts(resData.data || []);
+      console.log("商品資料:", resData);
     }
   };
-  const fetchCategories = async () => {
-    const res = await fetch("http://localhost:8080/categories", {
-      method: "GET",
-      credentials: "include",
-    });
-    if (res.ok) {
-      const resData = await res.json();
-      console.log(resData);
-    }
-  };
+
+  // 建立子分類 ID 到主分類 ID 的映射
+  const subToMainMap = subCategories.reduce((map, subCat) => {
+    map[subCat.id] = subCat.parentId;
+    return map;
+  }, {});
+
+  console.log("主分類:", mainCategories);
+  console.log("子分類:", subCategories);
+  console.log("子分類對應主分類映射:", subToMainMap);
+
   return (
     <>
       <MyNavbar />
       <Container className="WebContent">
-        {category.map((cat) => (
-          <Section
-            key={cat}
-            title={cat}
-            products={products
-              .filter((p) => p.category === cat)
-              .sort((a, b) => b.views - a.views)
-              .slice(0, 4)}
-          />
-        ))}
+        {mainCategories.map((mainCat) => {
+          // 修正：使用子分類映射來找出屬於該主分類的商品
+          const categoryProducts = products
+            .filter((product) => {
+              // 如果商品直接屬於主分類
+              if (product.categoryId === mainCat.id) return true;
+              // 如果商品屬於該主分類的子分類
+              return subToMainMap[product.categoryId] === mainCat.id;
+            })
+            .filter((p) => p.isActive !== false) // 只顯示上架商品（如果有 isActive 欄位）
+            .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0)) // 修正欄位名稱
+            .slice(0, 4);
+
+          // 只有該主分類有商品時才顯示
+          if (categoryProducts.length === 0) return null;
+
+          return (
+            <Section
+              key={mainCat.id}
+              title={mainCat.name}
+              products={categoryProducts}
+            />
+          );
+        })}
+
+        {/* 如果沒有任何商品顯示提示 */}
+        {products.length === 0 && (
+          <Row className="mt-5 justify-content-center">
+            <Col className="text-center">
+              <h3>目前沒有商品</h3>
+            </Col>
+          </Row>
+        )}
       </Container>
     </>
   );
@@ -69,12 +82,18 @@ function Section({ title, products }) {
     bags: "包包",
     dolls: "玩偶",
   };
+
   return (
     <Row className="mt-5 justify-content-center">
-      <h1>{titleMap[title]}</h1>
+      <Col xs={12}>
+        <h2 className="text-center mb-4">{titleMap[title] || title}</h2>
+      </Col>
       {products.map((product) => (
-        <Col key={product.id} className="pb-4" xs={10} lg={3}>
-          <Link to={`/product/${product.id}`}>
+        <Col key={product.id} className="pb-4" xs={12} sm={6} lg={3}>
+          <Link
+            to={`/product/${product.id}`}
+            style={{ textDecoration: "none" }}
+          >
             <ProductCard product={product} />
           </Link>
         </Col>
