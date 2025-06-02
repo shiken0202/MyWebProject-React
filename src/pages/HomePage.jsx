@@ -1,57 +1,81 @@
-import { Container, Row, Col } from 'react-bootstrap';
-import MyNavbar from '../components/MyNavbar';
-import ProductCard from '../components/ProductCard';
+import { Container, Row, Col } from "react-bootstrap";
+import MyNavbar from "../components/MyNavbar";
+import ProductCard from "../components/ProductCard";
 import React, { useState, useEffect } from "react";
-import { Link } from 'react-router-dom';
-
-
+import { Link } from "react-router-dom";
 
 function HomePage() {
   const [products, setProducts] = useState([]);
-  const [category,setCategory] =useState([]);
-  const [subCategory,setSubCategory] =useState([]);
-  const [views,setViews]=useState("")
+  const [category, setCategory] = useState([]);
+  const [subCategory, setSubCategory] = useState([]);
+  const [views, setViews] = useState("");
   useEffect(() => {
-    fetch("http://localhost:3000/products")
-      .then(res => res.json())
-      .then(data => {
+    fetchProducts();
+    fetchCategories();
+    fetch("http://localhost:8080/products")
+      .then((res) => res.json())
+      .then((data) => {
         setProducts(data);
-        setCategory([...new Set(data.map(p => p.category))]);
+        console.log(products);
+        setCategory([...new Set(data.map((p) => p.category))]);
         // setCategory(data.map(d=>d.category));
-        setSubCategory(...new Set(data.map(p => p.subCategory)));
+        setSubCategory(...new Set(data.map((p) => p.subCategory)));
+        console.log(res.json());
       })
-      .catch(err => console.log("載入失敗", err));
+      .catch((err) => console.log("載入失敗", err));
   }, []);
-  
+  const fetchProducts = async () => {
+    const res = await fetch("http://localhost:8080/products", {
+      method: "GET",
+      credentials: "include",
+    });
+    if (res.ok) {
+      const resData = await res.json();
+      console.log(resData);
+    }
+  };
+  const fetchCategories = async () => {
+    const res = await fetch("http://localhost:8080/categories", {
+      method: "GET",
+      credentials: "include",
+    });
+    if (res.ok) {
+      const resData = await res.json();
+      console.log(resData);
+    }
+  };
   return (
     <>
       <MyNavbar />
-      <Container className='WebContent'>
-        {category.map(cat =>
+      <Container className="WebContent">
+        {category.map((cat) => (
           <Section
             key={cat}
             title={cat}
-            products={(products.filter(p => p.category === cat)).sort((a,b)=>b.views-a.views).slice(0, 4)}
+            products={products
+              .filter((p) => p.category === cat)
+              .sort((a, b) => b.views - a.views)
+              .slice(0, 4)}
           />
-        )}
+        ))}
       </Container>
     </>
   );
 }
 
 function Section({ title, products }) {
-  const titleMap={
-    clothes:"衣服",
-    bags:"包包",
-    dolls:"玩偶"
+  const titleMap = {
+    clothes: "衣服",
+    bags: "包包",
+    dolls: "玩偶",
   };
   return (
     <Row className="mt-5 justify-content-center">
       <h1>{titleMap[title]}</h1>
-      {products.map(product => (
-        <Col key={product.id} className='pb-4' xs={10} lg={3}>
+      {products.map((product) => (
+        <Col key={product.id} className="pb-4" xs={10} lg={3}>
           <Link to={`/product/${product.id}`}>
-          <ProductCard product={product} />
+            <ProductCard product={product} />
           </Link>
         </Col>
       ))}

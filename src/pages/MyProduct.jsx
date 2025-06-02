@@ -27,7 +27,10 @@ function MyProduct() {
   const [editProductPrice, setEditProductPrice] = useState("");
   const [editProductStock, setEditProductStock] = useState("");
   const [editProductDescription, setEditProductDescription] = useState("");
-  const [isActive, setIsActive] = useState(false);
+  // 上傳圖片功能
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [uploadProducImageId, setUploadProducImageId] = useState(null);
   const [editDescription, setEditDescription] = useState("");
   const { userId, username, emailcheck, role } = useUser();
   console.log(userId);
@@ -298,6 +301,104 @@ function MyProduct() {
       alert("伺服器錯誤，請稍後再試。");
     }
   };
+  const handleImageUploadClick = (productId) => {
+    setUploadProducImageId(productId);
+    setShowImageModal(true);
+  };
+  const handleFileSelect = (e) => {
+    setSelectedFiles(Array.from(e.target.files));
+  };
+  const handleImageUpload = async (e) => {
+    e.preventDefault();
+
+    if (!selectedFiles.length) {
+      alert("請選擇圖片檔案");
+      return;
+    }
+
+    const formData = new FormData();
+    selectedFiles.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    try {
+      const res = await fetch(
+        `http://localhost:8080/${uploadProducImageId}/images`,
+        {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        setShowImageModal(false);
+        fetchProducts();
+        setSelectedFiles([]);
+      } else {
+        alert(data.message || "上傳失敗");
+      }
+    } catch (error) {
+      alert("伺服器錯誤，請稍後再試");
+    }
+  };
+  const handleDeleteAllImages = async (productId) => {
+    if (!window.confirm("確定要刪除所有照片嗎？")) return;
+    try {
+      const res = await fetch(`http://localhost:8080/${productId}/images`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message || "所有照片已刪除！");
+        // 重新載入商品或圖片列表
+        fetchProducts();
+      } else {
+        alert(data.message || "批次刪除失敗");
+      }
+    } catch (err) {
+      alert("伺服器錯誤，請稍後再試");
+    }
+  };
+  const handleActiveClick = async (Id) => {
+    try {
+      const res = await fetch(`http://localhost:8080/product/active/${Id}`, {
+        method: "PUT",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message || "上架成功！");
+        // 重新載入商品或圖片列表
+        fetchProducts();
+      } else {
+        alert(data.message || "上架失敗");
+      }
+    } catch (err) {
+      alert("伺服器錯誤，請稍後再試");
+    }
+  };
+  const handleIsNotActiveClick = async (Id) => {
+    try {
+      const res = await fetch(`http://localhost:8080/product/notactive/${Id}`, {
+        method: "PUT",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message || "下架成功！");
+        // 重新載入商品或圖片列表
+        fetchProducts();
+      } else {
+        alert(data.message || "下架失敗");
+      }
+    } catch (err) {
+      alert("伺服器錯誤，請稍後再試");
+    }
+  };
   const subCategoryNameMap = {
     male: "男用",
     female: "女用",
@@ -404,7 +505,9 @@ function MyProduct() {
                 <Form onSubmit={handleProductAddSubmit}>
                   <ModalBody>
                     <Form.Group className="mb-3">
-                      <Form.Label>商品名稱:</Form.Label>
+                      <Form.Label>
+                        商品名稱<span className="text-danger">*</span>
+                      </Form.Label>
                       <Form.Control
                         type="text"
                         placeholder="請輸入商品名稱"
@@ -414,7 +517,9 @@ function MyProduct() {
                       />
                     </Form.Group>
                     <Form.Group className="mb-3">
-                      <Form.Label>品牌</Form.Label>
+                      <Form.Label>
+                        品牌<span className="text-danger">*</span>
+                      </Form.Label>
                       <Form.Control
                         type="text"
                         placeholder="請輸入品牌名稱"
@@ -493,7 +598,9 @@ function MyProduct() {
                     </Form.Group>
                     {/* 商品描述 */}
                     <Form.Group className="mb-3">
-                      <Form.Label>商品描述</Form.Label>
+                      <Form.Label>
+                        商品描述<span className="text-danger">*</span>
+                      </Form.Label>
                       <Form.Control
                         as="textarea"
                         rows={3}
@@ -502,6 +609,7 @@ function MyProduct() {
                         onChange={(e) =>
                           setNewProductDescription(e.target.value)
                         }
+                        required
                       />
                     </Form.Group>
                   </ModalBody>
@@ -643,6 +751,39 @@ function MyProduct() {
                   </Modal.Footer>
                 </Form>
               </Modal>
+              {/*上傳照片*/}
+              <Modal
+                show={showImageModal}
+                onHide={() => setShowImageModal(false)}
+              >
+                <Modal.Header closeButton>
+                  <Modal.Title>上傳商品照片</Modal.Title>
+                </Modal.Header>
+                <Form onSubmit={handleImageUpload}>
+                  <Modal.Body>
+                    <Form.Group>
+                      <Form.Label>選擇圖片（可多選）</Form.Label>
+                      <Form.Control
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleFileSelect}
+                      />
+                    </Form.Group>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button
+                      variant="secondary"
+                      onClick={() => setShowImageModal(false)}
+                    >
+                      取消
+                    </Button>
+                    <Button variant="primary" type="submit">
+                      上傳
+                    </Button>
+                  </Modal.Footer>
+                </Form>
+              </Modal>
               <p />
               <Button variant="primary" onClick={handleProductAddClick}>
                 新增商品
@@ -672,7 +813,27 @@ function MyProduct() {
                     <td>${product.price}</td>
                     <td>{product.stock}</td>
                     <td>{product.description}</td>
-                    <td>{}</td>
+                    <td>
+                      {product.images && product.images.length > 0 ? (
+                        product.images.slice(0, 3).map((img, idx) => (
+                          <img
+                            key={idx}
+                            src={`http://localhost:8080${img.imageUrl}`}
+                            alt="商品圖片"
+                            style={{
+                              width: "50px",
+                              height: "50px",
+                              objectFit: "cover",
+                              marginRight: "4px",
+                              border: "1px solid #ddd",
+                              borderRadius: "4px",
+                            }}
+                          />
+                        ))
+                      ) : (
+                        <span className="text-muted">無圖片</span>
+                      )}
+                    </td>
                     <td>{product.isActive ? "上架中" : "已下架"}</td>
                     <td>
                       <Button
@@ -689,12 +850,37 @@ function MyProduct() {
                       >
                         刪除
                       </Button>
-                      <Button variant="outline-secondary" className="me-3">
+                      <Button
+                        variant="outline-secondary"
+                        className="me-3"
+                        onClick={() => handleImageUploadClick(product.id)}
+                      >
                         上傳照片
                       </Button>
-                      <Button variant="outline-info" className="me-3">
-                        上架 (切換)下架
+                      <Button
+                        variant="outline-danger"
+                        className="me-3"
+                        onClick={() => handleDeleteAllImages(product.id)}
+                      >
+                        刪除照片
                       </Button>
+                      {product.isActive ? (
+                        <Button
+                          variant="info"
+                          className="me-3"
+                          onClick={() => handleIsNotActiveClick(product.id)}
+                        >
+                          下架
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline-info"
+                          className="me-3"
+                          onClick={() => handleActiveClick(product.id)}
+                        >
+                          上架
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 ))}
