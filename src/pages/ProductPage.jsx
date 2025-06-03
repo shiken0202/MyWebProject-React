@@ -116,7 +116,7 @@ function ProductPage() {
           {titleMap[mainCategory.name][subCategory.name]}
         </h1>
 
-        <Row>
+        <Row className="d-flex align-items-stretch">
           {filteredProducts.map((product) => (
             <Col xs={12} md={4} lg={3} key={product.id} className="mb-4">
               <ProductCard product={product} />

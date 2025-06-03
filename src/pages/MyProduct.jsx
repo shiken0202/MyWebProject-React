@@ -803,18 +803,25 @@ function MyProduct() {
               </Button>
               <p />
             </div>
-            <Table striped bordered hover responsive>
+            <Table
+              striped
+              bordered
+              hover
+              responsive="md"
+              className="align-middle"
+              style={{ tableLayout: "fixed", width: "100%" }}
+            >
               <thead>
                 <tr>
-                  <th>商品名稱</th>
-                  <th>品牌名稱</th>
-                  <th>分類</th>
-                  <th>價格</th>
-                  <th>庫存</th>
-                  <th>描述</th>
-                  <th>照片</th>
-                  <th>上架狀態</th>
-                  <th>操作</th>
+                  <th style={{ width: "80px" }}>商品名稱</th>
+                  <th style={{ width: "60px" }}>品牌名稱</th>
+                  <th style={{ width: "40px" }}>分類</th>
+                  <th style={{ width: "50px" }}>價格</th>
+                  <th style={{ width: "30px" }}>庫存</th>
+                  <th style={{ width: "240px" }}>描述</th>
+                  <th style={{ width: "110px" }}>照片</th>
+                  <th style={{ width: "50px" }}>上架狀態</th>
+                  <th style={{ width: "260px" }}>操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -829,75 +836,85 @@ function MyProduct() {
                     </td>
                     <td>${product.price}</td>
                     <td>{product.stock}</td>
-                    <td>{product.description}</td>
+                    <td className="desc-cell">{product.description}</td>
                     <td>
-                      {product.images && product.images.length > 0 ? (
-                        product.images.slice(0, 3).map((img, idx) => (
-                          <img
-                            key={idx}
-                            src={`http://localhost:8080${img.imageUrl}`}
-                            alt="商品圖片"
-                            style={{
-                              width: "50px",
-                              height: "50px",
-                              objectFit: "cover",
-                              marginRight: "4px",
-                              border: "1px solid #ddd",
-                              borderRadius: "4px",
-                            }}
-                          />
-                        ))
-                      ) : (
-                        <span className="text-muted">無圖片</span>
-                      )}
+                      <div style={{ display: "flex", gap: "4px" }}>
+                        {product.images && product.images.length > 0 ? (
+                          product.images.slice(0, 3).map((img, idx) => (
+                            <img
+                              key={idx}
+                              src={`http://localhost:8080${img.imageUrl}`}
+                              alt="商品圖片"
+                              style={{
+                                width: "50px",
+                                height: "50px",
+                                objectFit: "cover",
+                                border: "1px solid #ddd",
+                                borderRadius: "4px",
+                              }}
+                            />
+                          ))
+                        ) : (
+                          <span className="text-muted">無圖片</span>
+                        )}
+                      </div>
                     </td>
                     <td>{product.isActive ? "上架中" : "已下架"}</td>
                     <td>
-                      <Button
-                        variant="warning"
-                        className="me-2"
-                        onClick={() => handleProductEditClick(product)}
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "4px",
+                        }}
                       >
-                        編輯
-                      </Button>
-                      <Button
-                        variant="danger"
-                        className="me-3"
-                        onClick={() => handleProductDelete(product.id)}
-                      >
-                        刪除
-                      </Button>
-                      <Button
-                        variant="outline-secondary"
-                        className="me-3"
-                        onClick={() => handleImageUploadClick(product.id)}
-                      >
-                        上傳照片
-                      </Button>
-                      <Button
-                        variant="outline-danger"
-                        className="me-3"
-                        onClick={() => handleDeleteAllImages(product.id)}
-                      >
-                        刪除照片
-                      </Button>
-                      {product.isActive ? (
+                        {/* 放你的按鈕 */}
                         <Button
-                          variant="info"
-                          className="me-3"
-                          onClick={() => handleIsNotActiveClick(product.id)}
+                          variant="warning"
+                          size="sm"
+                          onClick={() => handleProductEditClick(product)}
                         >
-                          下架
+                          編輯
                         </Button>
-                      ) : (
                         <Button
-                          variant="outline-info"
-                          className="me-3"
-                          onClick={() => handleActiveClick(product.id)}
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleProductDelete(product.id)}
                         >
-                          上架
+                          刪除
                         </Button>
-                      )}
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          onClick={() => handleImageUploadClick(product.id)}
+                        >
+                          上傳照片
+                        </Button>
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          onClick={() => handleDeleteAllImages(product.id)}
+                        >
+                          刪除照片
+                        </Button>
+                        {product.isActive ? (
+                          <Button
+                            variant="info"
+                            size="sm"
+                            onClick={() => handleIsNotActiveClick(product.id)}
+                          >
+                            下架
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="outline-info"
+                            size="sm"
+                            onClick={() => handleActiveClick(product.id)}
+                          >
+                            上架
+                          </Button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

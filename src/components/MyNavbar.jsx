@@ -136,7 +136,7 @@ function MyNavbar() {
     >
       <Container fluid>
         <Navbar.Brand as={Link} to="/">
-          網頁名稱
+          Pickify
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarScroll" />
         <Navbar.Collapse id="navbarScroll">

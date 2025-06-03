@@ -20,7 +20,6 @@ function HomePage() {
     if (res.ok) {
       const resData = await res.json();
       setProducts(resData.data || []);
-      console.log("商品資料:", resData);
     }
   };
 
@@ -29,10 +28,6 @@ function HomePage() {
     map[subCat.id] = subCat.parentId;
     return map;
   }, {});
-
-  console.log("主分類:", mainCategories);
-  console.log("子分類:", subCategories);
-  console.log("子分類對應主分類映射:", subToMainMap);
 
   return (
     <>
@@ -90,12 +85,7 @@ function Section({ title, products }) {
       </Col>
       {products.map((product) => (
         <Col key={product.id} className="pb-4" xs={12} sm={6} lg={3}>
-          <Link
-            to={`/product/${product.id}`}
-            style={{ textDecoration: "none" }}
-          >
-            <ProductCard product={product} />
-          </Link>
+          <ProductCard product={product} />
         </Col>
       ))}
     </Row>

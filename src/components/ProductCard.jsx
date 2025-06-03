@@ -16,8 +16,6 @@ function ProductCard({ product }) {
       credentials: "include",
     });
     const resData = await res.json();
-    console.log(resData.data);
-
     setStores(resData.data || []);
   };
   const store = stores.find((s) => s.id === product.storeId);
@@ -44,41 +42,42 @@ function ProductCard({ product }) {
     12: "others",
   };
   return (
-    <Card>
-      <Card.Body>
-        <Card.Title>{product.title}</Card.Title>
-        <Card.Subtitle className="mb-2 text-muted">
-          {product.brand}
-        </Card.Subtitle>
-        <Link to={`/product/${product.id}`}>
+    <Link to={`/product/${product.id}`} style={{ textDecoration: "none" }}>
+      <Card className="h-100">
+        <Card.Body>
+          <Card.Title>{product.title}</Card.Title>
+          <Card.Subtitle className="mb-2 text-muted">
+            {product.brand}
+          </Card.Subtitle>
+
           {product.images.slice(0, 1).map((img, idx) => (
             <Card.Img
+              key={img.id}
               variant="top"
               src={`http://localhost:8080${img.imageUrl}`}
               style={{ width: "200px", height: "250px", objectFit: "cover" }}
               className="d-block mx-auto"
             />
           ))}
-        </Link>
 
-        <Card.Text>
-          分類：
-          {
-            titleMap[mainCategoriesMap[subToMainMap[product.categoryId]]][
-              subCategoriesMap[product.categoryId]
-            ]
-          }
-          <br />
-          價格：${product.price} <br />
-          商場:
-          {store ? store.storeName : "載入中..."}
-          <br />
-          瀏覽次數:{product.viewCount}
-        </Card.Text>
-        {/* 可加購物車按鈕 */}
-        <Button variant="primary">加入購物車</Button>
-      </Card.Body>
-    </Card>
+          <Card.Text>
+            分類：
+            {
+              titleMap[mainCategoriesMap[subToMainMap[product.categoryId]]][
+                subCategoriesMap[product.categoryId]
+              ]
+            }
+            <br />
+            價格：${product.price} <br />
+            商場:
+            {store ? store.storeName : "載入中..."}
+            <br />
+            瀏覽次數:{product.viewCount}
+          </Card.Text>
+          {/* 可加購物車按鈕 */}
+        </Card.Body>
+      </Card>
+    </Link>
   );
 }
 
