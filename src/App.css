@@ -12,3 +12,8 @@ body, html, #root {
 .App {
   text-align: center;
 }
+.desc-cell {
+  word-break: break-all;
+  max-width: 240px;      /* 跟你的表格欄寬一致 */
+  white-space: pre-line; /* 保留換行符號 */
+}

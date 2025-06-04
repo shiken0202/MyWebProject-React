@@ -29,6 +29,8 @@ function MyNavbar() {
     checkLogin();
     fetchUserInfo();
   }, []);
+  console.log("UserId:" + userId);
+
   const checkLogin = async () => {
     try {
       const res = await fetch("http://localhost:8080/check-login", {
@@ -222,7 +224,7 @@ function MyNavbar() {
             ) : (
               ""
             )}
-            {role == "BUYER" ? (
+            {role == "BUYER" && isLoggedIn ? (
               <Button
                 variant="outline-warning"
                 as={Link}

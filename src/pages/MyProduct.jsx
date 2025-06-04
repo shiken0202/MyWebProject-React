@@ -619,12 +619,16 @@ function MyProduct() {
                         rows={3}
                         placeholder="請輸入商品描述"
                         value={newProductDescription}
+                        maxLength={255}
                         onChange={(e) =>
                           setNewProductDescription(e.target.value)
                         }
                         required
                       />
                     </Form.Group>
+                    <small className="text-muted">
+                      {newProductDescription.length}/255
+                    </small>
                   </ModalBody>
                   <Modal.Footer>
                     <Button
@@ -745,11 +749,15 @@ function MyProduct() {
                         rows={3}
                         placeholder="請輸入商品描述"
                         value={editProductDescription}
+                        maxLength={255}
                         onChange={(e) =>
                           setEditProductDescription(e.target.value)
                         }
                       />
                     </Form.Group>
+                    <small className="text-muted">
+                      {editProductDescription.length}/255
+                    </small>
                   </ModalBody>
                   <Modal.Footer>
                     <Button

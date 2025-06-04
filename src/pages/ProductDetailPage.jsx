@@ -7,8 +7,9 @@ import Carousel from "react-bootstrap/Carousel";
 function ProductDetailPage() {
   const { id } = useParams(); // 取得網址上的商品 id
   const [product, setProduct] = useState(null);
+  const [amount, setAmount] = useState(1);
   const [images, setImages] = useState([]);
-  const { categories, mainCategories, subCategories } = useCategory();
+  const { categories, mainCategories, subCategories } = useCategory("");
 
   useEffect(() => {
     // 取得商品主資料
@@ -20,6 +21,31 @@ function ProductDetailPage() {
     fetchViewCount(id);
   }, [id]);
   const [stores, setStores] = useState([]);
+
+  async function CreateCartItem(e) {
+    try {
+      e.preventDefault();
+      if (Number(amount) > product.stock) {
+        alert("庫存不足，請重新選擇");
+        return;
+      }
+      const res = await fetch("http://localhost:8080/cartitem/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        credentials: "include",
+        body: new URLSearchParams({ id: product.id, amount }),
+      });
+
+      if (res.ok) {
+        alert("成功加入購物車");
+      } else {
+        const errorData = await res.json();
+        alert(errorData.message || "購物車加入失敗");
+      }
+    } catch (err) {
+      alert("伺服器錯誤，請稍後再試");
+    }
+  }
   async function fetchAllStore() {
     const res = await fetch("http://localhost:8080/store/all", {
       method: "GET",
@@ -45,7 +71,8 @@ function ProductDetailPage() {
       console.error("更新瀏覽次數失敗", error);
     }
   };
-  if (!product) return <div>載入中或查無此商品</div>;
+  if (!product || !subCategories || !mainCategories)
+    return <div>載入中或查無此商品</div>;
   const store = stores.find((s) => s.id === product.storeId);
 
   const subToMainMap = subCategories.reduce((map, subCat) => {
@@ -69,6 +96,8 @@ function ProductDetailPage() {
     11: "sunrio",
     12: "others",
   };
+  console.log(amount);
+
   return (
     <>
       <MyNavbar />
@@ -134,21 +163,28 @@ function ProductDetailPage() {
                 </div>
 
                 <div className="d-flex gap-2">
-                  <Form.Select className="w-25" style={{ minWidth: "80px" }}>
-                    {[1, 2, 3, 4, 5].map((num) => (
-                      <option key={num} value={num}>
-                        {num}
-                      </option>
-                    ))}
-                  </Form.Select>
-                  <Button
-                    variant="outline-info"
-                    size="lg"
-                    className="flex-grow-1 d-flex align-items-center justify-content-center gap-2"
-                  >
-                    <i className="bi bi-cart-plus fs-5"></i>
-                    加入購物車
-                  </Button>
+                  <Form className="d-flex gap-2" onSubmit={CreateCartItem}>
+                    <Form.Select
+                      className="w-25"
+                      style={{ minWidth: "80px" }}
+                      onChange={(e) => setAmount(e.target.value)}
+                    >
+                      {[1, 2, 3, 4, 5].map((num) => (
+                        <option key={num} value={num}>
+                          {num}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <br />
+                    <Button
+                      variant="outline-info"
+                      size="lg"
+                      type="submit"
+                      className="flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                    >
+                      加入購物車
+                    </Button>
+                  </Form>
                 </div>
               </div>
 
