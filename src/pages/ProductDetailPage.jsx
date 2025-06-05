@@ -3,6 +3,7 @@ import MyNavbar from "../components/MyNavbar";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { useCategory } from "../context/CategoryContext";
+import { useUser } from "../context/UserContext";
 import Carousel from "react-bootstrap/Carousel";
 function ProductDetailPage() {
   const { id } = useParams(); // 取得網址上的商品 id
@@ -10,7 +11,8 @@ function ProductDetailPage() {
   const [amount, setAmount] = useState(1);
   const [images, setImages] = useState([]);
   const { categories, mainCategories, subCategories } = useCategory("");
-
+  const [stores, setStores] = useState([]);
+  const { userId, username, emailcheck, role } = useUser();
   useEffect(() => {
     // 取得商品主資料
     fetch(`http://localhost:8080/product/${id}`)
@@ -20,7 +22,6 @@ function ProductDetailPage() {
     fetchAllStore();
     fetchViewCount(id);
   }, [id]);
-  const [stores, setStores] = useState([]);
 
   async function CreateCartItem(e) {
     try {
@@ -52,6 +53,7 @@ function ProductDetailPage() {
       credentials: "include",
     });
     const resData = await res.json();
+    console.log(resData.data);
 
     setStores(resData.data || []);
   }
@@ -64,9 +66,6 @@ function ProductDetailPage() {
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-      // 根據後端回傳格式決定是否要處理回傳資料
-      // const data = await res.json();
-      // return data;
     } catch (error) {
       console.error("更新瀏覽次數失敗", error);
     }
@@ -176,14 +175,18 @@ function ProductDetailPage() {
                       ))}
                     </Form.Select>
                     <br />
-                    <Button
-                      variant="outline-info"
-                      size="lg"
-                      type="submit"
-                      className="flex-grow-1 d-flex align-items-center justify-content-center gap-2"
-                    >
-                      加入購物車
-                    </Button>
+                    {role == "BUYER" && userId != null ? (
+                      <Button
+                        variant="outline-info"
+                        size="lg"
+                        type="submit"
+                        className="flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                      >
+                        加入購物車
+                      </Button>
+                    ) : (
+                      "請先登入買家身份來加入購物車"
+                    )}
                   </Form>
                 </div>
               </div>

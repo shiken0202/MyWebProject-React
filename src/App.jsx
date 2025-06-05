@@ -11,6 +11,7 @@ import OrderList from "./pages/OrderList";
 import MyProduct from "./pages/MyProduct";
 import Register from "./pages/Register";
 import UserList from "./pages/UserList";
+import RequireAuth from "./components/RequireAuth";
 function App() {
   return (
     <BrowserRouter>
@@ -18,14 +19,51 @@ function App() {
         <CategoryProvider>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/products/user/cart" element={<Cart />} />
+
+            <Route
+              path="/products/user/cart"
+              element={
+                <RequireAuth>
+                  <Cart />
+                </RequireAuth>
+              }
+            />
+
             <Route path="/login" element={<Login />} />
             <Route path="/products/:main/:sub" element={<ProductPage />} />
             <Route path="/product/:id" element={<ProductDetailPage />} />
-            <Route path="/user/collect" element={<Collect />} />
-            <Route path="/user/myorder" element={<OrderList />} />
-            <Route path="/user/myproduct" element={<MyProduct />} />
-            <Route path="/user/userlist" element={<UserList />} />
+            <Route
+              path="/user/collect"
+              element={
+                <RequireAuth>
+                  <Collect />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/user/myorder"
+              element={
+                <RequireAuth>
+                  <OrderList />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/user/myproduct"
+              element={
+                <RequireAuth>
+                  <MyProduct />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/user/userlist"
+              element={
+                <RequireAuth>
+                  <UserList />
+                </RequireAuth>
+              }
+            />
             <Route path="/register" element={<Register />} />
             <Route path="*" element={<Navigate to="/" replace />} />
             {/* 可持續擴充更多路由 */}

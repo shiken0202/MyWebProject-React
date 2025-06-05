@@ -23,6 +23,7 @@ function MyNavbar() {
     setEmailcheck,
     role,
     setRole,
+    logout,
   } = useUser();
   const navigate = useNavigate();
   useEffect(() => {
@@ -53,6 +54,7 @@ function MyNavbar() {
       if (res.ok && resData.status === 200) {
         alert(resData.message);
         setIsLoggedIn(false);
+        logout();
         navigate("/");
       } else {
         alert("登出失敗：" + resData.message);
@@ -67,12 +69,21 @@ function MyNavbar() {
         method: "GET",
         credentials: "include",
       });
+      if (res.status === 401 || res.status === 403) {
+        // session 過期或沒權限
+        localStorage.removeItem("userId");
+        setIsLoggedIn(false);
+        return;
+      }
       const resData = await res.json();
       setUserId(resData.data.userId);
       setUsername(resData.data.userName);
       setRole(resData.data.role);
       setEmailcheck(resData.data.emailcheck);
-    } catch (err) {}
+    } catch (err) {
+      localStorage.removeItem("userId");
+      setIsLoggedIn(false);
+    }
   };
   const EmailchcekHandler = (e, path) => {
     if (!emailcheck) {

@@ -33,6 +33,9 @@ function MyProduct() {
   const [uploadProducImageId, setUploadProducImageId] = useState(null);
   const [editDescription, setEditDescription] = useState("");
   const { userId, username, emailcheck, role } = useUser();
+  if (!userId) {
+    return <Navigate to="/" replace />;
+  }
   console.log(userId);
   console.log(username);
   useEffect(() => {
@@ -135,6 +138,8 @@ function MyProduct() {
       }
     } catch (err) {
       alert("伺服器錯誤，請稍後再試");
+      localStorage.removeItem("userId");
+      window.location.replace("/");
     }
   };
 
@@ -430,7 +435,7 @@ function MyProduct() {
     <>
       <MyNavbar />
       <Container className="WebContent">
-        {storeInfo == null ? (
+        {storeInfo == null && userId != null ? (
           <>
             <Form onSubmit={createStore}>
               <Form.Group
