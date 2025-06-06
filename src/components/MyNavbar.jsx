@@ -119,7 +119,7 @@ function MyNavbar() {
               to="/user/myproduct"
               onClick={(e) => {
                 e.preventDefault();
-                EmailchcekHandler(e, "/user/myproduct");
+                EmailchcekHandler(e, "/user/myorder");
               }}
             >
               🌸商品管理
@@ -241,6 +241,7 @@ function MyNavbar() {
                 as={Link}
                 to="/products/user/cart"
                 className="me-2"
+                onClick={() => EmailchcekHandler()}
               >
                 🛒 購物車
               </Button>

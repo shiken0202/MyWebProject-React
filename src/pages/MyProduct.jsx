@@ -306,6 +306,7 @@ function MyProduct() {
       alert("伺服器錯誤，請稍後再試。");
     }
   };
+
   const handleImageUploadClick = (productId) => {
     setUploadProducImageId(productId);
     setShowImageModal(true);
@@ -840,8 +841,8 @@ function MyProduct() {
               <tbody>
                 {products.map((product) => (
                   <tr key={product.id}>
-                    <td>{product.title}</td>
-                    <td>{product.brand}</td>
+                    <td className="desc-cell">{product.title}</td>
+                    <td className="desc-cell">{product.brand}</td>
                     <td>
                       {categoriesMainMap[categoriesIdMap[product.categoryId]] +
                         ";" +
@@ -881,7 +882,6 @@ function MyProduct() {
                           gap: "4px",
                         }}
                       >
-                        {/* 放你的按鈕 */}
                         <Button
                           variant="warning"
                           size="sm"

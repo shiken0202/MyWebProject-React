@@ -66,7 +66,6 @@ function App() {
             />
             <Route path="/register" element={<Register />} />
             <Route path="*" element={<Navigate to="/" replace />} />
-            {/* 可持續擴充更多路由 */}
           </Routes>
         </CategoryProvider>
       </UserProvider>

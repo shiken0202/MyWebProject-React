@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import MyNavbar from "../components/MyNavbar";
 import { Container, Table, Button } from "react-bootstrap";
+import { useUser } from "../context/UserContext";
 function UserList() {
   const [users, setUsers] = useState([]);
-
+  const { userId, username, emailcheck, role } = useUser();
   useEffect(() => {
     fetchUsers(); // 在元件掛載時獲取使用者資料
   }, []);
@@ -40,16 +41,28 @@ function UserList() {
             {users.map((user) => (
               <tr key={user.id}>
                 <td>{user.id}</td>
-                <td>{user.userName}</td>
+                <td>
+                  {user.userName == username
+                    ? user.userName + "(目前登入中)"
+                    : user.userName}
+                </td>
                 <td>{user.email}</td>
                 <td>{user.emailConfirmok ? "已驗證" : "未驗證"}</td>
                 <td>{user.isbanned ? "已封鎖" : "優質用戶"}</td>
                 <td>{roleMap[user.role]}</td>
                 <td>
-                  <Button variant="warning" className="me-3">
+                  <Button
+                    variant="warning"
+                    className="me-3"
+                    disabled={user.role == "ADMIN"}
+                  >
                     封鎖
                   </Button>
-                  <Button variant="danger" className="me-3">
+                  <Button
+                    variant="danger"
+                    className="me-3"
+                    disabled={user.role == "ADMIN"}
+                  >
                     刪除
                   </Button>
                 </td>

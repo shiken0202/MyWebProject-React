@@ -26,6 +26,10 @@ function ProductDetailPage() {
   async function CreateCartItem(e) {
     try {
       e.preventDefault();
+      if (!emailcheck) {
+        alert("請先驗證Email");
+        return;
+      }
       if (Number(amount) > product.stock) {
         alert("庫存不足，請重新選擇");
         return;
@@ -95,7 +99,6 @@ function ProductDetailPage() {
     11: "sunrio",
     12: "others",
   };
-  console.log(amount);
 
   return (
     <>
@@ -103,7 +106,6 @@ function ProductDetailPage() {
       <Container className="WebContent my-5">
         {/* 商品主內容區塊 */}
         <Row className="g-4">
-          {/* 圖片輪播區 */}
           <Col xs={12} lg={6} className="mb-4">
             <div className="border rounded-3 p-3 bg-light">
               <Carousel
@@ -197,11 +199,13 @@ function ProductDetailPage() {
                 <dl className="row">
                   <dt className="col-sm-4 text-muted">商品分類</dt>
                   <dd className="col-sm-8">
-                    {
-                      titleMap[
-                        mainCategoriesMap[subToMainMap[product.categoryId]]
-                      ][subCategoriesMap[product.categoryId]]
-                    }
+                    {titleMap[
+                      mainCategoriesMap[subToMainMap[product.categoryId]]
+                    ][subCategoriesMap[product.categoryId]]
+                      ? titleMap[
+                          mainCategoriesMap[subToMainMap[product.categoryId]]
+                        ][subCategoriesMap[product.categoryId]]
+                      : ""}
                   </dd>
 
                   <dt className="col-sm-4 text-muted">庫存數量</dt>
