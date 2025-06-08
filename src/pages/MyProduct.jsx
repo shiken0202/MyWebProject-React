@@ -833,7 +833,7 @@ function MyProduct() {
                   <th style={{ width: "50px" }}>價格</th>
                   <th style={{ width: "30px" }}>庫存</th>
                   <th style={{ width: "240px" }}>描述</th>
-                  <th style={{ width: "110px" }}>照片</th>
+                  <th style={{ width: "125px" }}>照片</th>
                   <th style={{ width: "50px" }}>上架狀態</th>
                   <th style={{ width: "260px" }}>操作</th>
                 </tr>

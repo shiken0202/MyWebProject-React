@@ -86,15 +86,15 @@ function OrderList() {
   const CurrentBuyerOrders = buyerOrders.filter(
     (bos) => bos.status != "已完成" && bos.status != "已取消"
   );
-  const HistoryBuyerOrders = buyerOrders.filter(
-    (bos) => bos.status == "已完成" || bos.status == "已取消"
-  );
+  const HistoryBuyerOrders = buyerOrders
+    .filter((bos) => bos.status == "已完成" || bos.status == "已取消")
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const CurrentStoreOrders = storeOrders.filter(
     (bos) => bos.status != "已完成" && bos.status != "已取消"
   );
-  const HistoryStoreOrders = storeOrders.filter(
-    (bos) => bos.status == "已完成" || bos.status == "已取消"
-  );
+  const HistoryStoreOrders = storeOrders
+    .filter((bos) => bos.status == "已完成" || bos.status == "已取消")
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const handleCancelClick = async (id) => {
     const isConfirmed = window.confirm("是否確定要取消這筆訂單？");
     if (!isConfirmed) {
@@ -192,6 +192,7 @@ function OrderList() {
                       <th>配送方式</th>
                       <th>訂單狀態</th>
                       <th>付款方式</th>
+                      <th>下單時間</th>
                       <th>操作</th>
                     </tr>
                   </thead>
@@ -210,6 +211,7 @@ function OrderList() {
                           <td>{order.deliveryMethod}</td>
                           <td>{order.status}</td>
                           <td>{order.paymentType}</td>
+                          <td>{new Date(order.createdAt).toLocaleString()}</td>
                           <td>
                             <Button
                               className="me-2"
@@ -235,45 +237,81 @@ function OrderList() {
                         {/* 展開細項 row */}
                         {expandedOrderId === order.id && (
                           <tr>
-                            <td colSpan={9} className="bg-light">
-                              <strong>訂單商品明細：</strong>
-                              <Table size="sm" className="mb-0">
-                                <thead>
-                                  <tr>
-                                    <th>商品名稱</th>
-                                    <th>數量</th>
-                                    <th>單價</th>
-                                    <th>小計</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {items && items.length > 0 ? (
-                                    items.map((item, idx) => (
-                                      <tr key={idx}>
-                                        <td>
-                                          {
-                                            products.find(
-                                              (p) => p.id == item.productId
-                                            ).title
-                                          }
-                                        </td>
-                                        <td>{item.quantity}</td>
-                                        <td>${item.price}</td>
-                                        <td>${item.price * item.quantity}</td>
-                                      </tr>
-                                    ))
-                                  ) : (
+                            <td colSpan={9} className="bg-light p-3">
+                              <div className="border rounded shadow-sm p-3 bg-white">
+                                <h6 className="mb-3 text-primary">
+                                  <i className="bi bi-card-list me-2"></i>
+                                  訂單商品明細
+                                </h6>
+
+                                <Table size="sm" bordered hover>
+                                  <thead className="table-light">
                                     <tr>
-                                      <td
-                                        colSpan={4}
-                                        className="text-center text-muted"
-                                      >
-                                        無商品資料
-                                      </td>
+                                      <th>商品名稱</th>
+                                      <th>數量</th>
+                                      <th>單價</th>
+                                      <th>小計</th>
                                     </tr>
+                                  </thead>
+                                  <tbody>
+                                    {items && items.length > 0 ? (
+                                      items.map((item, idx) => {
+                                        const product = products.find(
+                                          (p) => p.id == item.productId
+                                        );
+                                        const title = product
+                                          ? product.title
+                                          : "未知商品";
+                                        const subtotal =
+                                          item.price * item.quantity;
+
+                                        return (
+                                          <tr key={idx}>
+                                            <td>{title}</td>
+                                            <td>{item.quantity}</td>
+                                            <td className="text-end">
+                                              ${item.price}
+                                            </td>
+                                            <td className="text-end fw-bold">
+                                              ${subtotal}
+                                            </td>
+                                          </tr>
+                                        );
+                                      })
+                                    ) : (
+                                      <tr>
+                                        <td
+                                          colSpan={4}
+                                          className="text-center text-muted"
+                                        >
+                                          無商品資料
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </tbody>
+                                  {/* Footer 小計 */}
+                                  {items && items.length > 0 && (
+                                    <tfoot>
+                                      <tr className="table-secondary">
+                                        <td
+                                          colSpan={3}
+                                          className="text-end fw-bold"
+                                        >
+                                          訂單總計
+                                        </td>
+                                        <td className="text-end fw-bold text-danger">
+                                          $
+                                          {items.reduce(
+                                            (sum, item) =>
+                                              sum + item.price * item.quantity,
+                                            0
+                                          )}
+                                        </td>
+                                      </tr>
+                                    </tfoot>
                                   )}
-                                </tbody>
-                              </Table>
+                                </Table>
+                              </div>
                             </td>
                           </tr>
                         )}
@@ -299,6 +337,7 @@ function OrderList() {
                       <th>配送方式</th>
                       <th>付款方式</th>
                       <th>訂單狀態</th>
+                      <th>下單時間</th>
                       <th>查看訂單</th>
                     </tr>
                   </thead>
@@ -319,6 +358,7 @@ function OrderList() {
                           <td>{order.deliveryMethod}</td>
                           <td>{order.paymentType}</td>
                           <td>{order.status}</td>
+                          <td>{new Date(order.createdAt).toLocaleString()}</td>
                           <td>
                             <Button
                               className="me-2"
@@ -337,45 +377,81 @@ function OrderList() {
                         </tr>
                         {expandedOrderId === order.id && (
                           <tr>
-                            <td colSpan={9} className="bg-light">
-                              <strong>訂單商品明細：</strong>
-                              <Table size="sm" className="mb-0">
-                                <thead>
-                                  <tr>
-                                    <th>商品名稱</th>
-                                    <th>數量</th>
-                                    <th>單價</th>
-                                    <th>小計</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {items && items.length > 0 ? (
-                                    items.map((item, idx) => (
-                                      <tr key={idx}>
-                                        <td>
-                                          {
-                                            products.find(
-                                              (p) => p.id == item.productId
-                                            ).title
-                                          }
-                                        </td>
-                                        <td>{item.quantity}</td>
-                                        <td>${item.price}</td>
-                                        <td>${item.price * item.quantity}</td>
-                                      </tr>
-                                    ))
-                                  ) : (
+                            <td colSpan={9} className="bg-light p-3">
+                              <div className="border rounded shadow-sm p-3 bg-white">
+                                <h6 className="mb-3 text-primary">
+                                  <i className="bi bi-card-list me-2"></i>
+                                  訂單商品明細
+                                </h6>
+
+                                <Table size="sm" bordered hover>
+                                  <thead className="table-light">
                                     <tr>
-                                      <td
-                                        colSpan={4}
-                                        className="text-center text-muted"
-                                      >
-                                        無商品資料
-                                      </td>
+                                      <th>商品名稱</th>
+                                      <th>數量</th>
+                                      <th>單價</th>
+                                      <th>小計</th>
                                     </tr>
+                                  </thead>
+                                  <tbody>
+                                    {items && items.length > 0 ? (
+                                      items.map((item, idx) => {
+                                        const product = products.find(
+                                          (p) => p.id == item.productId
+                                        );
+                                        const title = product
+                                          ? product.title
+                                          : "未知商品";
+                                        const subtotal =
+                                          item.price * item.quantity;
+
+                                        return (
+                                          <tr key={idx}>
+                                            <td>{title}</td>
+                                            <td>{item.quantity}</td>
+                                            <td className="text-end">
+                                              ${item.price}
+                                            </td>
+                                            <td className="text-end fw-bold">
+                                              ${subtotal}
+                                            </td>
+                                          </tr>
+                                        );
+                                      })
+                                    ) : (
+                                      <tr>
+                                        <td
+                                          colSpan={4}
+                                          className="text-center text-muted"
+                                        >
+                                          無商品資料
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </tbody>
+                                  {/* Footer 小計 */}
+                                  {items && items.length > 0 && (
+                                    <tfoot>
+                                      <tr className="table-secondary">
+                                        <td
+                                          colSpan={3}
+                                          className="text-end fw-bold"
+                                        >
+                                          訂單總計
+                                        </td>
+                                        <td className="text-end fw-bold text-danger">
+                                          $
+                                          {items.reduce(
+                                            (sum, item) =>
+                                              sum + item.price * item.quantity,
+                                            0
+                                          )}
+                                        </td>
+                                      </tr>
+                                    </tfoot>
                                   )}
-                                </tbody>
-                              </Table>
+                                </Table>
+                              </div>
                             </td>
                           </tr>
                         )}
@@ -406,39 +482,135 @@ function OrderList() {
                       <th>配送方式</th>
                       <th>訂單狀態</th>
                       <th>付款方式</th>
+                      <th>下單時間</th>
                       <th>操作</th>
                     </tr>
                   </thead>
                   <tbody>
                     {CurrentStoreOrders.map((order, index) => (
-                      <tr key={index}>
-                        <td>{index + 1}</td>
-                        <td>No.{order.id}</td>
-                        <td>
-                          {users.find((u) => u.id == order.userId).userName}
-                        </td>
-                        <td>{order.address}</td>
-                        <td>{order.totalAmount}</td>
-                        <td>{order.deliveryMethod}</td>
-                        <td>{order.status}</td>
-                        <td>{order.paymentType}</td>
-                        <td>
-                          <Button className="me-2">查看訂單明細</Button>
-                          <Button
-                            variant="outline-secondary"
-                            className="me-2"
-                            onClick={() => handleStatusEditOn(order)}
-                          >
-                            編輯訂單狀態
-                          </Button>
-                          <Button
-                            variant="outline-info"
-                            onClick={() => handleCancelClick(order.id)}
-                          >
-                            取消訂單
-                          </Button>
-                        </td>
-                      </tr>
+                      <React.Fragment key={order.id}>
+                        <tr key={index}>
+                          <td>{index + 1}</td>
+                          <td>No.{order.id}</td>
+                          <td>
+                            {users.find((u) => u.id == order.userId).userName}
+                          </td>
+                          <td>{order.address}</td>
+                          <td>{order.totalAmount}</td>
+                          <td>{order.deliveryMethod}</td>
+                          <td>{order.status}</td>
+                          <td>{order.paymentType}</td>
+                          <td>{new Date(order.createdAt).toLocaleString()}</td>
+                          <td>
+                            <Button
+                              className="me-2"
+                              onClick={() => {
+                                OrderDetailClick(order.id);
+                                setExpandedOrderId(
+                                  expandedOrderId === order.id ? null : order.id
+                                );
+                              }}
+                            >
+                              {expandedOrderId === order.id
+                                ? "收合明細"
+                                : "查看訂單明細"}
+                            </Button>
+                            <Button
+                              variant="outline-secondary"
+                              className="me-2"
+                              onClick={() => handleStatusEditOn(order)}
+                            >
+                              編輯訂單狀態
+                            </Button>
+                            <Button
+                              variant="outline-info"
+                              onClick={() => handleCancelClick(order.id)}
+                            >
+                              取消訂單
+                            </Button>
+                          </td>
+                        </tr>
+                        {expandedOrderId === order.id && (
+                          <tr>
+                            <td colSpan={10} className="bg-light p-3">
+                              <div className="border rounded shadow-sm p-3 bg-white">
+                                <h6 className="mb-3 text-primary">
+                                  <i className="bi bi-card-list me-2"></i>
+                                  訂單商品明細
+                                </h6>
+
+                                <Table size="sm" bordered hover>
+                                  <thead className="table-light">
+                                    <tr>
+                                      <th>商品名稱</th>
+                                      <th>數量</th>
+                                      <th>單價</th>
+                                      <th>小計</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {items && items.length > 0 ? (
+                                      items.map((item, idx) => {
+                                        const product = products.find(
+                                          (p) => p.id == item.productId
+                                        );
+                                        const title = product
+                                          ? product.title
+                                          : "未知商品";
+                                        const subtotal =
+                                          item.price * item.quantity;
+
+                                        return (
+                                          <tr key={idx}>
+                                            <td>{title}</td>
+                                            <td>{item.quantity}</td>
+                                            <td className="text-end">
+                                              ${item.price}
+                                            </td>
+                                            <td className="text-end fw-bold">
+                                              ${subtotal}
+                                            </td>
+                                          </tr>
+                                        );
+                                      })
+                                    ) : (
+                                      <tr>
+                                        <td
+                                          colSpan={4}
+                                          className="text-center text-muted"
+                                        >
+                                          無商品資料
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </tbody>
+                                  {/* Footer 小計 */}
+                                  {items && items.length > 0 && (
+                                    <tfoot>
+                                      <tr className="table-secondary">
+                                        <td
+                                          colSpan={3}
+                                          className="text-end fw-bold"
+                                        >
+                                          訂單總計
+                                        </td>
+                                        <td className="text-end fw-bold text-danger">
+                                          $
+                                          {items.reduce(
+                                            (sum, item) =>
+                                              sum + item.price * item.quantity,
+                                            0
+                                          )}
+                                        </td>
+                                      </tr>
+                                    </tfoot>
+                                  )}
+                                </Table>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     ))}
                   </tbody>
                 </Table>
@@ -458,24 +630,124 @@ function OrderList() {
                       <th>地址</th>
                       <th>訂單金額</th>
                       <th>配送方式</th>
-                      <th>訂單狀態</th>
                       <th>付款方式</th>
+                      <th>訂單狀態</th>
+                      <th>下單時間</th>
+                      <th>操作</th>
                     </tr>
                   </thead>
                   <tbody>
                     {HistoryStoreOrders.map((order, index) => (
-                      <tr key={index}>
-                        <td>{index + 1}</td>
-                        <td>No.{order.id}</td>
-                        <td>
-                          {users.find((u) => u.id == order.userId).userName}
-                        </td>
-                        <td>{order.address}</td>
-                        <td>{order.totalAmount}</td>
-                        <td>{order.deliveryMethod}</td>
-                        <td>{order.status}</td>
-                        <td>{order.paymentType}</td>
-                      </tr>
+                      <React.Fragment key={order.id}>
+                        <tr key={index}>
+                          <td>{index + 1}</td>
+                          <td>No.{order.id}</td>
+                          <td>
+                            {users.find((u) => u.id == order.userId).userName}
+                          </td>
+                          <td>{order.address}</td>
+                          <td>{order.totalAmount}</td>
+                          <td>{order.deliveryMethod}</td>
+                          <td>{order.paymentType}</td>
+                          <td>{order.status}</td>
+                          <td>{new Date(order.createdAt).toLocaleString()}</td>
+                          <td>
+                            <Button
+                              className="me-2"
+                              onClick={() => {
+                                OrderDetailClick(order.id);
+                                setExpandedOrderId(
+                                  expandedOrderId === order.id ? null : order.id
+                                );
+                              }}
+                            >
+                              {expandedOrderId === order.id
+                                ? "收合明細"
+                                : "查看訂單明細"}
+                            </Button>
+                          </td>
+                        </tr>
+                        {expandedOrderId === order.id && (
+                          <tr>
+                            <td colSpan={10} className="bg-light p-3">
+                              <div className="border rounded shadow-sm p-3 bg-white">
+                                <h6 className="mb-3 text-primary">
+                                  <i className="bi bi-card-list me-2"></i>
+                                  訂單商品明細
+                                </h6>
+
+                                <Table size="sm" bordered hover>
+                                  <thead className="table-light">
+                                    <tr>
+                                      <th>商品名稱</th>
+                                      <th>數量</th>
+                                      <th>單價</th>
+                                      <th>小計</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {items && items.length > 0 ? (
+                                      items.map((item, idx) => {
+                                        const product = products.find(
+                                          (p) => p.id == item.productId
+                                        );
+                                        const title = product
+                                          ? product.title
+                                          : "未知商品";
+                                        const subtotal =
+                                          item.price * item.quantity;
+
+                                        return (
+                                          <tr key={idx}>
+                                            <td>{title}</td>
+                                            <td>{item.quantity}</td>
+                                            <td className="text-end">
+                                              ${item.price}
+                                            </td>
+                                            <td className="text-end fw-bold">
+                                              ${subtotal}
+                                            </td>
+                                          </tr>
+                                        );
+                                      })
+                                    ) : (
+                                      <tr>
+                                        <td
+                                          colSpan={4}
+                                          className="text-center text-muted"
+                                        >
+                                          無商品資料
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </tbody>
+                                  {/* Footer 小計 */}
+                                  {items && items.length > 0 && (
+                                    <tfoot>
+                                      <tr className="table-secondary">
+                                        <td
+                                          colSpan={3}
+                                          className="text-end fw-bold"
+                                        >
+                                          訂單總計
+                                        </td>
+                                        <td className="text-end fw-bold text-danger">
+                                          $
+                                          {items.reduce(
+                                            (sum, item) =>
+                                              sum + item.price * item.quantity,
+                                            0
+                                          )}
+                                        </td>
+                                      </tr>
+                                    </tfoot>
+                                  )}
+                                </Table>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     ))}
                   </tbody>
                 </Table>

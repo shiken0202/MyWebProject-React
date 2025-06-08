@@ -8,6 +8,7 @@ import { useCategory } from "../context/CategoryContext";
 function HomePage() {
   const [products, setProducts] = useState([]);
   const { categories, mainCategories, subCategories } = useCategory();
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -43,8 +44,7 @@ function HomePage() {
               return subToMainMap[product.categoryId] === mainCat.id;
             })
             .filter((p) => p.isActive !== false) // 只顯示上架商品（如果有 isActive 欄位）
-            .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0)) // 修正欄位名稱
-            .slice(0, 4);
+            .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0)); // 修正欄位名稱
 
           // 只有該主分類有商品時才顯示
           if (categoryProducts.length === 0) return null;
@@ -58,7 +58,6 @@ function HomePage() {
           );
         })}
 
-        {/* 如果沒有任何商品顯示提示 */}
         {products.length === 0 && (
           <Row className="mt-5 justify-content-center">
             <Col className="text-center">
@@ -77,17 +76,47 @@ function Section({ title, products }) {
     bags: "包包",
     dolls: "玩偶",
   };
+  const PAGE_SIZE = 4;
+  const [startIdx, setStartIdx] = useState(0);
+  const total = products.length;
 
+  // 取出目前要顯示的 4 張商品
+  const displayProducts = products.slice(startIdx, startIdx + PAGE_SIZE);
+
+  // 處理循環分頁
+  const handlePrev = () => {
+    setStartIdx((prev) =>
+      prev - PAGE_SIZE < 0 ? Math.max(total - PAGE_SIZE, 0) : prev - PAGE_SIZE
+    );
+  };
+  const handleNext = () => {
+    setStartIdx((prev) => (prev + PAGE_SIZE >= total ? 0 : prev + PAGE_SIZE));
+  };
   return (
     <Row className="mt-5 justify-content-center">
       <Col xs={12}>
         <h2 className="text-center mb-4">{titleMap[title] || title}</h2>
       </Col>
-      {products.map((product) => (
-        <Col key={product.id} className="pb-4" xs={12} sm={6} lg={3}>
+
+      {displayProducts.map((product) => (
+        <Col key={product.id} className="pb-4 " xs={12} sm={6} lg={3}>
           <ProductCard product={product} />
         </Col>
       ))}
+
+      {total > PAGE_SIZE && (
+        <Col xs={12} className="d-flex justify-content-center mt-2">
+          <button
+            className="btn btn-outline-secondary me-2"
+            onClick={handlePrev}
+          >
+            上一頁
+          </button>
+          <button className="btn btn-outline-secondary" onClick={handleNext}>
+            下一頁
+          </button>
+        </Col>
+      )}
     </Row>
   );
 }

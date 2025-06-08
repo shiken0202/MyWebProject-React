@@ -9,5 +9,6 @@ html, body, #root {
 }
 .WebContent{
   padding-top: 60px;
+  padding-bottom: 60px;
 }
 

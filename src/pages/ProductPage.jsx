@@ -58,7 +58,6 @@ function ProductPage() {
     );
   }
 
-  // 檢查 URL 參數是否有效[2]
   if (!main || !sub) {
     return (
       <>
@@ -111,7 +110,6 @@ function ProductPage() {
     <>
       <MyNavbar />
       <Container className="WebContent">
-        {/* 安全存取物件屬性[5] */}
         <h1 className="my-4">
           {titleMap[mainCategory.name][subCategory.name]}
         </h1>

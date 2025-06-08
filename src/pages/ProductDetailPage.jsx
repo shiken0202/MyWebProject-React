@@ -154,7 +154,6 @@ function ProductDetailPage() {
                 </div>
               </div>
 
-              {/* 價格與操作區 */}
               <div className="mb-4">
                 <div className="d-flex align-items-baseline gap-2 mb-3">
                   <span className="fs-5 text-muted">售價</span>
@@ -177,7 +176,7 @@ function ProductDetailPage() {
                       ))}
                     </Form.Select>
                     <br />
-                    {role == "BUYER" && userId != null ? (
+                    {role === "BUYER" && !!userId ? (
                       <Button
                         variant="outline-info"
                         size="lg"
