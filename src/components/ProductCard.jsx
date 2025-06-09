@@ -41,6 +41,10 @@ function ProductCard({ product }) {
     11: "sunrio",
     12: "others",
   };
+  const mainId = subToMainMap[product.categoryId];
+  const mainKey = mainCategoriesMap[mainId];
+  const subKey = subCategoriesMap[product.categoryId];
+  const categoryName = titleMap[mainKey]?.[subKey] ?? "未知分類";
   return (
     <Link to={`/product/${product.id}`} style={{ textDecoration: "none" }}>
       <Card className="h-100">
@@ -62,11 +66,7 @@ function ProductCard({ product }) {
 
           <Card.Text>
             分類：
-            {
-              titleMap[mainCategoriesMap[subToMainMap[product.categoryId]]][
-                subCategoriesMap[product.categoryId]
-              ]
-            }
+            {categoryName}
             <br />
             價格：${product.price} <br />
             商場:

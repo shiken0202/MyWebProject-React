@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 function MyNavbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [keyword, setKeyword] = useState("");
   const {
     userId,
     setUserId,
@@ -92,6 +93,12 @@ function MyNavbar() {
       navigate("/");
     } else {
       navigate(path);
+    }
+  };
+  const handleSerchSubmit = (e) => {
+    e.preventDefault(); // 防止刷新
+    if (keyword.trim()) {
+      navigate(`/search?q=${encodeURIComponent(keyword.trim())}`);
     }
   };
   const rolelink = () => {
@@ -268,14 +275,18 @@ function MyNavbar() {
             )}
           </div>
         </Navbar.Collapse>
-        <Form className="d-flex me-3">
+        <Form className="d-flex me-3" onSubmit={handleSerchSubmit}>
           <FormControl
             type="search"
             placeholder="搜尋商品"
             className="me-2"
             aria-label="Search"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
           />
-          <Button variant="outline-success">🔍</Button>
+          <Button variant="outline-success" type="submit">
+            🔍
+          </Button>
         </Form>
       </Container>
     </Navbar>

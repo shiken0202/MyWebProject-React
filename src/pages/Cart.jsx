@@ -406,7 +406,7 @@ function Cart() {
                           required
                         >
                           <option value="信用卡">信用卡付款</option>
-                          <option value="超商取貨付款">超商取貨付款</option>
+                          <option value="貨到付款">貨到付款</option>
                           <option value="ATM轉帳">ATM轉帳</option>
                         </Form.Select>
                       </div>

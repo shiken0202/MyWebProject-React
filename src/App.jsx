@@ -12,6 +12,7 @@ import MyProduct from "./pages/MyProduct";
 import Register from "./pages/Register";
 import UserList from "./pages/UserList";
 import RequireAuth from "./components/RequireAuth";
+import SearchPage from "./pages/SearchPage";
 function App() {
   return (
     <BrowserRouter>
@@ -65,6 +66,7 @@ function App() {
               }
             />
             <Route path="/register" element={<Register />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </CategoryProvider>

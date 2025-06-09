@@ -100,6 +100,7 @@ function OrderList() {
     if (!isConfirmed) {
       return;
     }
+
     try {
       const res = await fetch(`http://localhost:8080/orders/cancel/${id}`, {
         method: "PUT",
@@ -171,6 +172,8 @@ function OrderList() {
       console.log(resData);
     }
   };
+  console.log(items);
+
   const Orders = () => {
     switch (role) {
       case "BUYER":
@@ -226,18 +229,30 @@ function OrderList() {
                                 ? "收合明細"
                                 : "查看訂單明細"}
                             </Button>
-                            <Button
-                              variant="outline-info"
-                              onClick={() => handleCancelClick(order.id)}
-                            >
-                              取消訂單
-                            </Button>
+                            {order.status == "已出貨" ? (
+                              <span title="訂單已出貨，無法取消">
+                                <Button
+                                  variant="outline-info"
+                                  onClick={() => handleCancelClick(order.id)}
+                                  disabled
+                                >
+                                  取消訂單
+                                </Button>
+                              </span>
+                            ) : (
+                              <Button
+                                variant="outline-info"
+                                onClick={() => handleCancelClick(order.id)}
+                              >
+                                取消訂單
+                              </Button>
+                            )}
                           </td>
                         </tr>
                         {/* 展開細項 row */}
                         {expandedOrderId === order.id && (
                           <tr>
-                            <td colSpan={9} className="bg-light p-3">
+                            <td colSpan={10} className="bg-light p-3">
                               <div className="border rounded shadow-sm p-3 bg-white">
                                 <h6 className="mb-3 text-primary">
                                   <i className="bi bi-card-list me-2"></i>
@@ -259,11 +274,12 @@ function OrderList() {
                                         const product = products.find(
                                           (p) => p.id == item.productId
                                         );
-                                        const title = product
-                                          ? product.title
+                                        const title = items
+                                          ? item.productTitleSnapshot
                                           : "未知商品";
                                         const subtotal =
-                                          item.price * item.quantity;
+                                          item.productPriceSnapshot *
+                                          item.quantity;
 
                                         return (
                                           <tr key={idx}>
@@ -377,7 +393,7 @@ function OrderList() {
                         </tr>
                         {expandedOrderId === order.id && (
                           <tr>
-                            <td colSpan={9} className="bg-light p-3">
+                            <td colSpan={10} className="bg-light p-3">
                               <div className="border rounded shadow-sm p-3 bg-white">
                                 <h6 className="mb-3 text-primary">
                                   <i className="bi bi-card-list me-2"></i>
@@ -399,11 +415,12 @@ function OrderList() {
                                         const product = products.find(
                                           (p) => p.id == item.productId
                                         );
-                                        const title = product
-                                          ? product.title
+                                        const title = items
+                                          ? item.productTitleSnapshot
                                           : "未知商品";
                                         const subtotal =
-                                          item.price * item.quantity;
+                                          item.productPriceSnapshot *
+                                          item.quantity;
 
                                         return (
                                           <tr key={idx}>
@@ -522,12 +539,24 @@ function OrderList() {
                             >
                               編輯訂單狀態
                             </Button>
-                            <Button
-                              variant="outline-info"
-                              onClick={() => handleCancelClick(order.id)}
-                            >
-                              取消訂單
-                            </Button>
+                            {order.status == "已出貨" ? (
+                              <span title="訂單已出貨，無法取消">
+                                <Button
+                                  variant="outline-info"
+                                  onClick={() => handleCancelClick(order.id)}
+                                  disabled
+                                >
+                                  取消訂單
+                                </Button>
+                              </span>
+                            ) : (
+                              <Button
+                                variant="outline-info"
+                                onClick={() => handleCancelClick(order.id)}
+                              >
+                                取消訂單
+                              </Button>
+                            )}
                           </td>
                         </tr>
                         {expandedOrderId === order.id && (
@@ -554,11 +583,12 @@ function OrderList() {
                                         const product = products.find(
                                           (p) => p.id == item.productId
                                         );
-                                        const title = product
-                                          ? product.title
+                                        const title = items
+                                          ? item.productTitleSnapshot
                                           : "未知商品";
                                         const subtotal =
-                                          item.price * item.quantity;
+                                          item.productPriceSnapshot *
+                                          item.quantity;
 
                                         return (
                                           <tr key={idx}>
@@ -691,11 +721,12 @@ function OrderList() {
                                         const product = products.find(
                                           (p) => p.id == item.productId
                                         );
-                                        const title = product
-                                          ? product.title
+                                        const title = items
+                                          ? item.productTitleSnapshot
                                           : "未知商品";
                                         const subtotal =
-                                          item.price * item.quantity;
+                                          item.productPriceSnapshot *
+                                          item.quantity;
 
                                         return (
                                           <tr key={idx}>
