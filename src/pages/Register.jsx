@@ -12,6 +12,7 @@ import MyNavbar from "../components/MyNavbar";
 import { Link, useNavigate } from "react-router-dom";
 
 function Register() {
+  const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -55,6 +56,7 @@ function Register() {
     }
 
     setErrors({});
+    setLoading(true);
 
     try {
       const res = await fetch("http://localhost:8080/register", {
@@ -78,6 +80,8 @@ function Register() {
       }
     } catch (err) {
       setRegisterError("伺服器錯誤，請稍後再試");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,6 +94,12 @@ function Register() {
 
           {registerError && <Alert variant="danger">{registerError}</Alert>}
 
+          {loading && (
+            <div className="text-center my-3">
+              <div className="spinner-border text-primary" role="status" />
+              <div className="mt-2">註冊中，請稍候...</div>
+            </div>
+          )}
           <Form onSubmit={handleSubmit}>
             {/* 身份選擇按鈕組 */}
             <Form.Group className="mb-4">
@@ -173,7 +183,7 @@ function Register() {
             </Form.Group>
 
             <Button variant="primary" type="submit" className="w-100 mb-3">
-              註冊
+              {!loading ? "註冊" : "註冊中..."}
             </Button>
 
             <div className="text-center">

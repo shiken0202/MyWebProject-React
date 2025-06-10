@@ -155,7 +155,7 @@ function MyNavbar() {
       style={{ backgroundColor: "#e3f2fd" }}
     >
       <Container fluid>
-        <Navbar.Brand as={Link} to="/">
+        <Navbar.Brand as={Link} to="/" reloadDocument>
           Pickify
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarScroll" />
@@ -201,7 +201,7 @@ function MyNavbar() {
 
             {isLoggedIn && (
               <>
-                <Nav.Link
+                {/* <Nav.Link
                   as={Link}
                   to="/user/collect"
                   onClick={(e) => {
@@ -210,7 +210,7 @@ function MyNavbar() {
                   }}
                 >
                   💗收藏賣場
-                </Nav.Link>
+                </Nav.Link> */}
                 {role != "ADMIN" ? (
                   <Nav.Link
                     as={Link}

@@ -13,6 +13,7 @@ function ProductDetailPage() {
   const { categories, mainCategories, subCategories } = useCategory("");
   const [stores, setStores] = useState([]);
   const { userId, username, emailcheck, role } = useUser();
+  const [rate, setRate] = useState("");
   useEffect(() => {
     // 取得商品主資料
     fetch(`http://localhost:8080/product/${id}`)
@@ -21,11 +22,33 @@ function ProductDetailPage() {
       .catch(() => setProduct(null));
     fetchAllStore();
     fetchViewCount(id);
+    fetchCurrencyRate();
   }, [id]);
+
+  async function fetchCurrencyRate() {
+    const res = await fetch("http://localhost:8080/twd-jpy", {
+      method: "GET",
+      credentials: "include",
+    });
+    if (res.ok) {
+      const resData = await res.json();
+      console.log(resData);
+      setRate(resData.data);
+    }
+  }
+  const jpyFormat = (value) =>
+    new Intl.NumberFormat("ja-JP", {
+      style: "currency",
+      currency: "JPY",
+    }).format(value);
 
   async function CreateCartItem(e) {
     try {
       e.preventDefault();
+      if (userId == null || role != "BUYER") {
+        alert("請先登入買家身份來加入購物車!");
+        return;
+      }
       if (!emailcheck) {
         alert("請先驗證Email");
         return;
@@ -160,9 +183,37 @@ function ProductDetailPage() {
                   <span className="fs-3 fw-bold text-danger">
                     ${product.price.toLocaleString()}
                   </span>
+                  <span className="fs-5 text-muted">換算日幣約為</span>
+                  <span className="fs-3 fw-bold text-primary">
+                    {jpyFormat(product.price * rate)}
+                  </span>
+                </div>
+                <div className="alert alert-light d-flex align-items-center justify-content-between mb-3 shadow-sm border rounded">
+                  <span className="text-muted small">
+                    <i className="bi bi-info-circle me-1"></i>
+                    資料來源：
+                    <a
+                      href="https://tw.rter.info/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="link-secondary text-decoration-underline"
+                    >
+                      RTER.info 全球即時匯率API
+                    </a>
+                  </span>
+                  <span className="fs-5 fw-bold text-primary">
+                    當前匯率 台幣 : 日幣
+                    <span className="badge bg-success ms-2">
+                      1 :{" "}
+                      {rate.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </span>
                 </div>
 
-                <div className="d-flex gap-2">
+                <div className="d-flex gap-2 ">
                   <Form className="d-flex gap-2" onSubmit={CreateCartItem}>
                     <Form.Select
                       className="w-25"
@@ -176,18 +227,15 @@ function ProductDetailPage() {
                       ))}
                     </Form.Select>
                     <br />
-                    {role === "BUYER" && !!userId ? (
-                      <Button
-                        variant="outline-info"
-                        size="lg"
-                        type="submit"
-                        className="flex-grow-1 d-flex align-items-center justify-content-center gap-2"
-                      >
-                        加入購物車
-                      </Button>
-                    ) : (
-                      "請先登入買家身份來加入購物車"
-                    )}
+
+                    <Button
+                      variant="outline-info"
+                      size="lg"
+                      type="submit"
+                      className="flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                    >
+                      加入購物車
+                    </Button>
                   </Form>
                 </div>
               </div>
@@ -200,7 +248,7 @@ function ProductDetailPage() {
                   <dd className="col-sm-8">
                     {titleMap[
                       mainCategoriesMap[subToMainMap[product.categoryId]]
-                    ][subCategoriesMap[product.categoryId]]
+                    ]?.[subCategoriesMap[product.categoryId]]
                       ? titleMap[
                           mainCategoriesMap[subToMainMap[product.categoryId]]
                         ][subCategoriesMap[product.categoryId]]

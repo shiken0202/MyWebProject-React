@@ -13,6 +13,9 @@ import Register from "./pages/Register";
 import UserList from "./pages/UserList";
 import RequireAuth from "./components/RequireAuth";
 import SearchPage from "./pages/SearchPage";
+import EmailConfirmPage from "./pages/EmailConfirmPage";
+import EmailConfirmSuccessPage from "./pages/EmailConfirmSuccessPage";
+import EmailConfirmErrorPage from "./pages/EmailConfirmErrorPage";
 function App() {
   return (
     <BrowserRouter>
@@ -67,6 +70,18 @@ function App() {
             />
             <Route path="/register" element={<Register />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route
+              path="/MyWebProject/email/confirm"
+              element={<EmailConfirmPage />}
+            />
+            <Route
+              path="/email-confirm-success"
+              element={<EmailConfirmSuccessPage />}
+            />
+            <Route
+              path="/email-confirm-error"
+              element={<EmailConfirmErrorPage />}
+            />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </CategoryProvider>

@@ -366,7 +366,7 @@ function OrderList() {
                           <td>
                             {
                               stores.find((s) => s.id == order.storeId)
-                                .storeName
+                                ?.storeName
                             }
                           </td>
                           <td>{order.address}</td>
@@ -510,7 +510,7 @@ function OrderList() {
                           <td>{index + 1}</td>
                           <td>No.{order.id}</td>
                           <td>
-                            {users.find((u) => u.id == order.userId).userName}
+                            {users.find((u) => u.id == order.userId)?.userName}
                           </td>
                           <td>{order.address}</td>
                           <td>{order.totalAmount}</td>
@@ -673,7 +673,7 @@ function OrderList() {
                           <td>{index + 1}</td>
                           <td>No.{order.id}</td>
                           <td>
-                            {users.find((u) => u.id == order.userId).userName}
+                            {users.find((u) => u.id == order.userId)?.userName}
                           </td>
                           <td>{order.address}</td>
                           <td>{order.totalAmount}</td>
