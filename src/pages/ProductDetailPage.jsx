@@ -24,6 +24,7 @@ function ProductDetailPage() {
     fetchViewCount(id);
     fetchCurrencyRate();
   }, [id]);
+  console.log(product);
 
   async function fetchCurrencyRate() {
     const res = await fetch("http://localhost:8080/twd-jpy", {
