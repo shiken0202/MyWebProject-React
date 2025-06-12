@@ -25,18 +25,13 @@ const ChatRoom = ({ show, onClose, buyerId, storeId, storeName }) => {
     setMessages((prev) => {
       const updated = [...prev, newMessage];
       messagesRef.current = updated;
+
       return updated;
     });
   }, []);
 
   useEffect(() => {
     if (show && buyerId && storeId) {
-      // 重置狀態
-      setMessages([]);
-      setChatRoomId(null);
-      setIsHistoryLoaded(false);
-      isSubscribedRef.current = false;
-
       // 先嘗試獲取聊天室和歷史訊息
       initializeChatRoom().then((roomId) => {
         // 建立 WebSocket 連線
@@ -63,11 +58,13 @@ const ChatRoom = ({ show, onClose, buyerId, storeId, storeName }) => {
       );
       if (response.ok) {
         const chatRoom = await response.json();
-        if (chatRoom && chatRoom.id) {
-          setChatRoomId(chatRoom.id);
-          await loadChatHistory(chatRoom.id);
+        console.log(chatRoom);
+
+        if (chatRoom && chatRoom.data.id) {
+          setChatRoomId(chatRoom.data.id);
+          await loadChatHistory(chatRoom.data.id);
           setIsHistoryLoaded(true);
-          return chatRoom.id;
+          return chatRoom.data.id;
         }
       }
       // 沒有聊天室，標記已載入（但不載入任何訊息）
@@ -140,6 +137,8 @@ const ChatRoom = ({ show, onClose, buyerId, storeId, storeName }) => {
         const data = await response.json();
         if (data.data && data.data.length > 0) {
           setMessages(data.data);
+          console.log(data.data);
+
           messagesRef.current = data.data;
         }
       }
@@ -223,6 +222,7 @@ const ChatRoom = ({ show, onClose, buyerId, storeId, storeName }) => {
                       }`}
                       style={{ maxWidth: "75%" }}
                     >
+                      <div>{msg.senderName}:</div>
                       <div>{msg.content}</div>
                       <small
                         className={`${
@@ -261,7 +261,7 @@ const ChatRoom = ({ show, onClose, buyerId, storeId, storeName }) => {
               onClick={sendMessage}
               disabled={!isConnected || !inputMessage.trim()}
             >
-              <i className="bi bi-send"></i>
+              <i className="bi bi-send">✉︎</i>
             </Button>
           </div>
         </Form>
