@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { useCategory } from "../context/CategoryContext";
 import { useUser } from "../context/UserContext";
 import Carousel from "react-bootstrap/Carousel";
+import ChatRoom from "../components/ChatRoom";
 function ProductDetailPage() {
   const { id } = useParams(); // 取得網址上的商品 id
   const [product, setProduct] = useState(null);
@@ -14,6 +15,8 @@ function ProductDetailPage() {
   const [stores, setStores] = useState([]);
   const { userId, username, emailcheck, role } = useUser();
   const [rate, setRate] = useState("");
+  const [showChat, setShowChat] = useState(false);
+  const [chatRoomId, setChatRoomId] = useState(null);
   useEffect(() => {
     // 取得商品主資料
     fetch(`http://localhost:8080/product/${id}`)
@@ -85,6 +88,7 @@ function ProductDetailPage() {
 
     setStores(resData.data || []);
   }
+
   const fetchViewCount = async () => {
     try {
       const res = await fetch(`http://localhost:8080/product/view/${id}`, {
@@ -123,7 +127,22 @@ function ProductDetailPage() {
     11: "sunrio",
     12: "others",
   };
+  const handleChatClick = () => {
+    if (!userId || role !== "BUYER") {
+      alert("請先登入買家身份才能與賣家聊天！");
+      return;
+    }
+    if (!emailcheck) {
+      alert("請先驗證Email");
+      return;
+    }
+    setShowChat(true);
+  };
 
+  // 關閉聊天室
+  const handleChatClose = () => {
+    setShowChat(false);
+  };
   return (
     <>
       <MyNavbar />
@@ -303,9 +322,17 @@ function ProductDetailPage() {
                       <p className="text-muted mb-0">{store.description}</p>
                     </div>
                   </div>
-                  <Button variant="outline-primary" size="sm">
-                    <i className="bi bi-info-circle me-2"></i>
+                  <Button variant="outline-primary" className="gap-2" size="sm">
+                    <i className="bi bi-info-circle me-2 "></i>
                     查看店家頁面
+                  </Button>
+                  <Button
+                    className="ms-2"
+                    variant="outline-primary"
+                    onClick={handleChatClick}
+                  >
+                    <i className="bi bi-chat-dots me-2"></i>
+                    與賣家聊聊
                   </Button>
                 </>
               ) : (
@@ -315,6 +342,16 @@ function ProductDetailPage() {
                 </div>
               )}
             </div>
+            {store && (
+              <ChatRoom
+                show={showChat}
+                onClose={handleChatClose}
+                buyerId={userId}
+                storeId={store.id}
+                storeName={store.storeName}
+              />
+            )}
+            {console.log(userId)}
           </Col>
         </Row>
       </Container>
