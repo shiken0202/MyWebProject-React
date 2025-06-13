@@ -8,13 +8,19 @@ import {
   Button,
   Stack,
 } from "react-bootstrap";
+
 import { useUser } from "../context/UserContext";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ChatRoom from "./ChatRoom";
 function MyNavbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [keyword, setKeyword] = useState("");
+  const [chatRooms, setChatRooms] = useState([]);
+  const [showChat, setShowChat] = useState(false);
+  const [isLoadingChats, setIsLoadingChats] = useState(false);
+  const [selectedChatRoom, setSelectedChatRoom] = useState(null);
   const {
     userId,
     setUserId,
@@ -30,8 +36,60 @@ function MyNavbar() {
   useEffect(() => {
     checkLogin();
     fetchUserInfo();
-  }, []);
+    fetchChatRooms();
+    if (isLoggedIn && userId && userId !== "undefined" && emailcheck) {
+      // 添加輕微延遲確保狀態完全同步
+      const timeoutId = setTimeout(() => {
+        fetchChatRooms();
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isLoggedIn, userId]);
   console.log("UserId:" + userId);
+
+  const fetchChatRooms = async () => {
+    // 確保 userId 存在且有效
+    if (!userId || userId === "undefined" || !emailcheck) {
+      return;
+    }
+    setIsLoadingChats(true);
+    try {
+      const res = await fetch(
+        `http://localhost:8080/chatrooms?userId=${userId}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (res.ok) {
+        const resData = await res.json();
+        console.log("聊天室資料:", resData.data);
+        setChatRooms(resData.data || []);
+      } else {
+        console.error("API 請求失敗:", res.status, res.statusText);
+      }
+    } catch (error) {
+      console.error("網路請求錯誤:", error);
+      setError("無法載入聊天室，請檢查網路連線");
+    } finally {
+      setIsLoadingChats(false);
+    }
+  };
+  const buyersChatRooms = (chatRooms || []).filter((f) => f.buyerId == userId);
+  const storeChatRooms = (chatRooms || []).filter((f) => f.sellerId == userId);
+  console.log(buyersChatRooms);
+
+  const handleChatRoomsClick = (chatRoom) => {
+    setSelectedChatRoom(chatRoom);
+    setShowChat(true);
+  };
+  const handleChatClose = () => {
+    setSelectedChatRoom(null);
+    setShowChat(false);
+  };
 
   const checkLogin = async () => {
     try {
@@ -91,6 +149,7 @@ function MyNavbar() {
       alert("請先驗證Email");
       window.location.reload();
       navigate("/");
+      return;
     } else {
       navigate(path);
     }
@@ -104,19 +163,64 @@ function MyNavbar() {
   const rolelink = () => {
     switch (role) {
       case "BUYER":
-        return null;
-      case "SELLER":
         return (
-          <Nav.Link
-            as={Link}
-            to="/user/myproduct"
+          <NavDropdown
+            title="💬 聊天室"
+            id="chat-nav-dropdown"
             onClick={(e) => {
               e.preventDefault();
-              EmailchcekHandler(e, "/user/myproduct");
+              EmailchcekHandler(e);
             }}
           >
-            🌸我的賣場
-          </Nav.Link>
+            {buyersChatRooms.length === 0 ? (
+              <div className="text-center">"空空如也"</div>
+            ) : (
+              buyersChatRooms.map((m) => (
+                <NavDropdown.Item
+                  key={m.id}
+                  onClick={() => handleChatRoomsClick(m)}
+                >
+                  {"🏬 " + m.storeName}
+                </NavDropdown.Item>
+              ))
+            )}
+          </NavDropdown>
+        );
+      case "SELLER":
+        return (
+          <>
+            <Nav.Link
+              as={Link}
+              to="/user/myproduct"
+              onClick={(e) => {
+                e.preventDefault();
+                EmailchcekHandler(e, "/user/myproduct");
+              }}
+            >
+              🌸我的賣場
+            </Nav.Link>
+            <NavDropdown
+              title="💬 聊天室"
+              id="chat-nav-dropdown"
+              onClick={(e) => {
+                e.preventDefault();
+                EmailchcekHandler(e);
+              }}
+            >
+              {storeChatRooms.length === 0 ? (
+                <div className="text-center">"空空如也"</div>
+              ) : (
+                storeChatRooms.map((m) => (
+                  <NavDropdown.Item
+                    key={m.id}
+                    onClick={() => handleChatRoomsClick(m)}
+                  >
+                    {"🧛‍♀️ " + m.buyerName}
+                  </NavDropdown.Item>
+                ))
+              )}
+            </NavDropdown>
+          </>
         );
       case "ADMIN":
         return (
@@ -201,16 +305,6 @@ function MyNavbar() {
 
             {isLoggedIn && (
               <>
-                {/* <Nav.Link
-                  as={Link}
-                  to="/user/collect"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    EmailchcekHandler(e, "/user/collect");
-                  }}
-                >
-                  💗收藏賣場
-                </Nav.Link> */}
                 {role != "ADMIN" ? (
                   <Nav.Link
                     as={Link}
@@ -248,7 +342,10 @@ function MyNavbar() {
                 as={Link}
                 to="/products/user/cart"
                 className="me-2"
-                onClick={() => EmailchcekHandler()}
+                onClick={(e) => {
+                  e.preventDefault(),
+                    EmailchcekHandler(e, "/products/user/cart");
+                }}
               >
                 🛒 購物車
               </Button>
@@ -288,6 +385,16 @@ function MyNavbar() {
             🔍
           </Button>
         </Form>
+
+        <ChatRoom
+          show={showChat}
+          onClose={handleChatClose}
+          buyerId={selectedChatRoom?.buyerId}
+          sellerId={selectedChatRoom?.sellerId}
+          storeId={selectedChatRoom?.storeId}
+          buyerName={selectedChatRoom?.buyerName}
+          storeName={selectedChatRoom?.storeName}
+        />
       </Container>
     </Navbar>
   );

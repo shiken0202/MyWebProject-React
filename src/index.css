@@ -11,4 +11,80 @@ html, body, #root {
   padding-top: 60px;
   padding-bottom: 60px;
 }
+.chat-header{
+  background: linear-gradient(135deg,#4e54c8 0%,#8f94fb 100%);
+}
 
+/* 背景圖樣 + 柔和顏色 */
+.chat-body{
+  background-color:#eef1ff;
+  background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='0.5' fill='%23d0d4ff'/%3E%3C/svg%3E");
+}
+
+/* 共用泡泡基礎 */
+.bubble{
+  position:relative;
+  max-width:70%;
+  padding:12px 16px;
+  border-radius:18px;
+  word-break:break-word;
+  white-space:pre-wrap;
+}
+
+/* 收訊者泡泡 */
+.bubble-receiver{
+  background:#ffffff;
+  color:#212529;
+}
+.bubble-receiver:before{
+  content:"";
+  position:absolute;
+  left:-6px;
+  bottom:8px;
+  border-width:6px 6px 6px 0;
+  border-style:solid;
+  border-color:transparent #ffffff transparent transparent;
+}
+
+/* 發送者泡泡 */
+.bubble-sender{
+  background:#4e54c8;
+  color:#ffffff;
+}
+.bubble-sender:after{
+  content:"";
+  position:absolute;
+  right:-6px;
+  bottom:8px;
+  border-width:6px 0 6px 6px;
+  border-style:solid;
+  border-color:transparent transparent transparent #4e54c8;
+}
+.send-btn-pulse {
+  background: #0d6efd !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.send-btn-pulse::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.send-btn-pulse:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.send-btn-pulse i {
+  position: relative;
+  z-index: 1;
+}

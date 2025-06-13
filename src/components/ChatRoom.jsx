@@ -1,9 +1,21 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Modal, Form, Button, ListGroup } from "react-bootstrap";
+import { Modal, Form, Button, ListGroup, InputGroup } from "react-bootstrap";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client/dist/sockjs.min.js";
+import { useUser } from "../context/UserContext";
+import Draggable from "react-free-draggable";
 
-const ChatRoom = ({ show, onClose, buyerId, storeId, storeName }) => {
+const ChatRoom = ({
+  show,
+  onClose,
+  buyerId,
+  sellerId,
+  storeId,
+  storeName,
+  buyerName,
+  ...otherProps
+}) => {
+  const { userId, username, emailcheck, role } = useUser();
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isConnected, setIsConnected] = useState(false);
@@ -14,7 +26,7 @@ const ChatRoom = ({ show, onClose, buyerId, storeId, storeName }) => {
   const messagesEndRef = useRef(null);
   const messagesRef = useRef([]);
   const isSubscribedRef = useRef(false);
-
+  const nodeRef = useRef(null);
   // 同步 messages state 到 ref
   useEffect(() => {
     messagesRef.current = messages;
@@ -150,7 +162,7 @@ const ChatRoom = ({ show, onClose, buyerId, storeId, storeName }) => {
   const sendMessage = () => {
     if (!inputMessage.trim() || !stompClientRef.current || !isConnected) return;
     const messageData = {
-      senderId: buyerId,
+      senderId: userId,
       content: inputMessage,
     };
     stompClientRef.current.publish({
@@ -172,99 +184,162 @@ const ChatRoom = ({ show, onClose, buyerId, storeId, storeName }) => {
       sendMessage();
     }
   };
-
+  const DraggableDialog = React.forwardRef((props, ref) => (
+    <Draggable handle=".modal-header" nodeRef={ref}>
+      {/* ref 要掛在 .modal-dialog 本身 */}
+      <div
+        ref={ref}
+        {...props}
+        style={{
+          position: "fixed",
+          top: "25%",
+          left: "35%",
+          maxWidth: "600px",
+          maxHeight: "800px",
+          width: "90vw",
+          height: "90vw",
+          ...props.style,
+        }}
+      />
+    </Draggable>
+  ));
   return (
-    <Modal show={show} onHide={onClose} size="lg" centered>
-      <Modal.Header closeButton>
-        <Modal.Title>
-          <i className="bi bi-chat-dots me-2"></i>與 {storeName} 聊聊
-        </Modal.Title>
-        <div className="ms-auto">
-          <span
-            className={`badge ${isConnected ? "bg-success" : "bg-secondary"}`}
-          >
-            {isConnected ? "已連線" : "連線中..."}
-          </span>
-        </div>
-      </Modal.Header>
-      <Modal.Body
-        style={{ height: "400px", display: "flex", flexDirection: "column" }}
+    <Modal
+      show={show}
+      onHide={onClose}
+      size="md"
+      dialogAs={DraggableDialog} /* 核心：真正包到 .modal-dialog */
+      enforceFocus={false}
+      {...otherProps}
+    >
+      {/* ---------- 頂端：漸層標題 ---------- */}
+      <Modal.Header
+        closeButton
+        className="chat-header text-white py-3 px-4 border-0"
       >
-        <div
-          className="flex-grow-1 overflow-auto mb-3 border rounded p-3"
-          style={{ backgroundColor: "#f8f9fa" }}
+        <Modal.Title className="d-flex align-items-center">
+          <i className="bi bi-chat-dots-fill me-2"></i>
+          {role == "BUYER" ? (
+            <span>與 {storeName} 聊聊</span>
+          ) : (
+            <span>與 {buyerName} 聊聊</span>
+          )}
+        </Modal.Title>
+        {/* 連線狀態
+        <span
+          className={`badge ms-auto ${
+            isConnected ? "bg-success" : "bg-secondary"
+          }`}
         >
-          <div style={{ minHeight: "20px" }}>
-            {!isHistoryLoaded ? (
-              <div className="text-center text-muted py-4">
-                <span>載入中...</span>
-              </div>
-            ) : messages.length === 0 ? (
-              <div className="text-center text-muted py-4">
-                <i className="bi bi-chat-square-text fs-1"></i>
-                <p className="mt-2">開始對話吧！</p>
-              </div>
-            ) : (
-              <ListGroup variant="flush">
-                {messages.map((msg, index) => (
-                  <ListGroup.Item
-                    key={`${msg.id || index}-${msg.createdAt || Date.now()}`}
-                    className={`border-0 mb-2 ${
-                      msg.senderId === buyerId ? "text-end" : "text-start"
+          {isConnected ? "已連線" : "連線中..."}
+        </span> */}
+      </Modal.Header>
+
+      {/* ---------- 中段：訊息區 ---------- */}
+      <Modal.Body
+        className="d-flex flex-column p-0 chat-body"
+        style={{ height: "500px" }}
+      >
+        <div className="flex-grow-1 overflow-auto px-4 pt-4">
+          {!isHistoryLoaded ? (
+            <div className="d-flex h-100 justify-content-center align-items-center text-muted">
+              <span>載入中…</span>
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="d-flex h-100 flex-column justify-content-center align-items-center text-muted">
+              <i className="bi bi-chat-right-dots fs-1"></i>
+              <p className="mt-2">開始對話吧！</p>
+            </div>
+          ) : (
+            messages.map((msg, index) => {
+              const isSender = msg.senderId === userId;
+              const time = msg.createdAt
+                ? new Date(msg.createdAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "";
+              return (
+                <div
+                  key={`${msg.id || index}-${msg.createdAt || Date.now()}`}
+                  className={`d-flex mb-4 ${
+                    isSender ? "justify-content-end" : "justify-content-start"
+                  }`}
+                >
+                  {/* 頭像 */}
+                  {!isSender && (
+                    <i className="bi bi-shop fs-4 text-secondary me-2 avatar"></i>
+                  )}
+                  {isSender && (
+                    <i className="bi bi-person-circle fs-4 text-secondary ms-2 order-2 avatar"></i>
+                  )}
+
+                  {/* 訊息泡泡 */}
+                  <div
+                    className={`bubble ${
+                      isSender ? "bubble-sender" : "bubble-receiver"
                     }`}
-                    style={{ backgroundColor: "transparent" }}
                   >
+                    {msg.senderId == sellerId ? (
+                      <div className="fw-bold small">{storeName}</div>
+                    ) : (
+                      <div className="fw-bold small">{msg.senderName}</div>
+                    )}
+
+                    <div className="mt-1">{msg.content}</div>
                     <div
-                      className={`d-inline-block p-2 rounded ${
-                        msg.senderId === buyerId
-                          ? "bg-primary text-white"
-                          : "bg-white border"
+                      className={`text-end mt-1 small ${
+                        isSender ? "text-white-50" : "text-muted"
                       }`}
-                      style={{ maxWidth: "75%" }}
                     >
-                      <div>{msg.senderName}:</div>
-                      <div>{msg.content}</div>
-                      <small
-                        className={`${
-                          msg.senderId === buyerId ? "text-light" : "text-muted"
-                        }`}
-                      >
-                        {msg.createdAt
-                          ? new Date(msg.createdAt).toLocaleTimeString()
-                          : ""}
-                      </small>
+                      {time}
                     </div>
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            )}
-          </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
           <div ref={messagesEndRef} />
         </div>
-        <Form
-          onSubmit={(e) => {
-            e.preventDefault();
-            sendMessage();
-          }}
-        >
-          <div className="d-flex gap-2">
-            <Form.Control
-              type="text"
-              placeholder="輸入訊息..."
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              disabled={!isConnected}
-            />
-            <Button
-              variant="primary"
-              onClick={sendMessage}
-              disabled={!isConnected || !inputMessage.trim()}
-            >
-              <i className="bi bi-send">✉︎</i>
-            </Button>
-          </div>
-        </Form>
+
+        {/* ---------- 底部：輸入區 ---------- */}
+        <div className="p-3 border-top bg-white">
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+              sendMessage();
+            }}
+          >
+            <InputGroup>
+              <Form.Control
+                type="text"
+                placeholder="輸入訊息…"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                disabled={!isConnected}
+                className="rounded-pill bg-light border-0 me-2"
+              />
+              <Button
+                variant="primary"
+                onClick={sendMessage}
+                disabled={!isConnected || !inputMessage.trim()}
+                className={`d-flex align-items-center justify-content-center ${
+                  inputMessage.trim() ? "send-btn-expanded" : "send-btn-compact"
+                }`}
+                style={{
+                  borderRadius: "25px",
+                  height: "50px",
+                  minWidth: inputMessage.trim() ? "90px" : "50px",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                <i className="bi bi-send-fill" style={{ fontSize: "18px" }}></i>
+                {inputMessage.trim() && <span className="ms-2">送出</span>}
+              </Button>
+            </InputGroup>
+          </Form>
+        </div>
       </Modal.Body>
     </Modal>
   );

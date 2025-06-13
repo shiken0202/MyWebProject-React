@@ -6,6 +6,7 @@ import { useCategory } from "../context/CategoryContext";
 import { useUser } from "../context/UserContext";
 import Carousel from "react-bootstrap/Carousel";
 import ChatRoom from "../components/ChatRoom";
+
 function ProductDetailPage() {
   const { id } = useParams(); // 取得網址上的商品 id
   const [product, setProduct] = useState(null);
