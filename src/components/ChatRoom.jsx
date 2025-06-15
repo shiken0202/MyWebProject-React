@@ -5,6 +5,45 @@ import SockJS from "sockjs-client/dist/sockjs.min.js";
 import { useUser } from "../context/UserContext";
 import Draggable from "react-free-draggable";
 
+// 1. 外層容器
+const CenteredModalWrapper = ({ children, show }) =>
+  show ? (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 1050,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "rgba(0,0,0,0.2)", // 淡淡遮罩
+      }}
+    >
+      {children}
+    </div>
+  ) : null;
+
+//只要 DraggableDialog 在 function 外部宣告，React 只會認得它是同一個元件，Modal 內容就不會每次輸入都被重建
+const DraggableDialog = React.forwardRef((props, ref) => {
+  // 只計算一次，保證每次 render 都是同一個初始座標
+
+  return (
+    <Draggable handle=".modal-header" nodeRef={ref}>
+      <div
+        ref={ref}
+        {...props}
+        style={{
+          position: "fixed",
+          top: "20%",
+          left: "35%",
+          width: "800px",
+          height: "1000px",
+          transform: "translateX(-50%)",
+        }}
+      />
+    </Draggable>
+  );
+});
 const ChatRoom = ({
   show,
   onClose,
@@ -184,48 +223,32 @@ const ChatRoom = ({
       sendMessage();
     }
   };
-  const DraggableDialog = React.forwardRef((props, ref) => (
-    <Draggable handle=".modal-header" nodeRef={ref}>
-      {/* ref 要掛在 .modal-dialog 本身 */}
-      <div
-        ref={ref}
-        {...props}
-        style={{
-          position: "fixed",
-          top: "25%",
-          left: "35%",
-          maxWidth: "600px",
-          maxHeight: "800px",
-          width: "90vw",
-          height: "90vw",
-          ...props.style,
-        }}
-      />
-    </Draggable>
-  ));
+
   return (
-    <Modal
-      show={show}
-      onHide={onClose}
-      size="md"
-      dialogAs={DraggableDialog} /* 核心：真正包到 .modal-dialog */
-      enforceFocus={false}
-      {...otherProps}
-    >
-      {/* ---------- 頂端：漸層標題 ---------- */}
-      <Modal.Header
-        closeButton
-        className="chat-header text-white py-3 px-4 border-0"
+    <CenteredModalWrapper show={show}>
+      <Modal
+        show={show}
+        onHide={onClose}
+        size="md"
+        dialogAs={DraggableDialog}
+        enforceFocus={false}
+        backdrop={false}
+        {...otherProps}
       >
-        <Modal.Title className="d-flex align-items-center">
-          <i className="bi bi-chat-dots-fill me-2"></i>
-          {role == "BUYER" ? (
-            <span>與 {storeName} 聊聊</span>
-          ) : (
-            <span>與 {buyerName} 聊聊</span>
-          )}
-        </Modal.Title>
-        {/* 連線狀態
+        {/* ---------- 頂端：漸層標題 ---------- */}
+        <Modal.Header
+          closeButton
+          className="chat-header text-white py-3 px-4 border-0"
+        >
+          <Modal.Title className="d-flex align-items-center">
+            <i className="bi bi-chat-dots-fill me-2"></i>
+            {role == "BUYER" ? (
+              <span>與 {storeName} 聊聊</span>
+            ) : (
+              <span>與 {buyerName} 聊聊</span>
+            )}
+          </Modal.Title>
+          {/* 連線狀態
         <span
           className={`badge ms-auto ${
             isConnected ? "bg-success" : "bg-secondary"
@@ -233,115 +256,119 @@ const ChatRoom = ({
         >
           {isConnected ? "已連線" : "連線中..."}
         </span> */}
-      </Modal.Header>
-
-      {/* ---------- 中段：訊息區 ---------- */}
-      <Modal.Body
-        className="d-flex flex-column p-0 chat-body"
-        style={{ height: "500px" }}
-      >
-        <div className="flex-grow-1 overflow-auto px-4 pt-4">
-          {!isHistoryLoaded ? (
-            <div className="d-flex h-100 justify-content-center align-items-center text-muted">
-              <span>載入中…</span>
-            </div>
-          ) : messages.length === 0 ? (
-            <div className="d-flex h-100 flex-column justify-content-center align-items-center text-muted">
-              <i className="bi bi-chat-right-dots fs-1"></i>
-              <p className="mt-2">開始對話吧！</p>
-            </div>
-          ) : (
-            messages.map((msg, index) => {
-              const isSender = msg.senderId === userId;
-              const time = msg.createdAt
-                ? new Date(msg.createdAt).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "";
-              return (
-                <div
-                  key={`${msg.id || index}-${msg.createdAt || Date.now()}`}
-                  className={`d-flex mb-4 ${
-                    isSender ? "justify-content-end" : "justify-content-start"
-                  }`}
-                >
-                  {/* 頭像 */}
-                  {!isSender && (
-                    <i className="bi bi-shop fs-4 text-secondary me-2 avatar"></i>
-                  )}
-                  {isSender && (
-                    <i className="bi bi-person-circle fs-4 text-secondary ms-2 order-2 avatar"></i>
-                  )}
-
-                  {/* 訊息泡泡 */}
+        </Modal.Header>
+        <Modal.Body
+          className="d-flex flex-column p-0 chat-body"
+          style={{ height: "500px" }}
+        >
+          <div className="flex-grow-1 overflow-auto px-4 pt-4">
+            {!isHistoryLoaded ? (
+              <div className="d-flex h-100 justify-content-center align-items-center text-muted">
+                <span>載入中…</span>
+              </div>
+            ) : messages.length === 0 ? (
+              <div className="d-flex h-100 flex-column justify-content-center align-items-center text-muted">
+                <i className="bi bi-chat-right-dots fs-1"></i>
+                <p className="mt-2">開始對話吧！</p>
+              </div>
+            ) : (
+              messages.map((msg, index) => {
+                const isSender = msg.senderId === userId;
+                const time = msg.createdAt
+                  ? new Date(msg.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "";
+                return (
                   <div
-                    className={`bubble ${
-                      isSender ? "bubble-sender" : "bubble-receiver"
+                    key={`${msg.id || index}-${msg.createdAt || Date.now()}`}
+                    className={`d-flex mb-4 ${
+                      isSender ? "justify-content-end" : "justify-content-start"
                     }`}
                   >
-                    {msg.senderId == sellerId ? (
-                      <div className="fw-bold small">{storeName}</div>
-                    ) : (
-                      <div className="fw-bold small">{msg.senderName}</div>
+                    {/* 頭像 */}
+                    {!isSender && (
+                      <i className="bi bi-shop fs-4 text-secondary me-2 avatar"></i>
+                    )}
+                    {isSender && (
+                      <i className="bi bi-person-circle fs-4 text-secondary ms-2 order-2 avatar"></i>
                     )}
 
-                    <div className="mt-1">{msg.content}</div>
+                    {/* 訊息泡泡 */}
                     <div
-                      className={`text-end mt-1 small ${
-                        isSender ? "text-white-50" : "text-muted"
+                      className={`bubble ${
+                        isSender ? "bubble-sender" : "bubble-receiver"
                       }`}
                     >
-                      {time}
+                      {msg.senderId == sellerId ? (
+                        <div className="fw-bold small">{storeName}</div>
+                      ) : (
+                        <div className="fw-bold small">{msg.senderName}</div>
+                      )}
+
+                      <div className="mt-1">{msg.content}</div>
+                      <div
+                        className={`text-end mt-1 small ${
+                          isSender ? "text-white-50" : "text-muted"
+                        }`}
+                      >
+                        {time}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+                );
+              })
+            )}
+            <div ref={messagesEndRef} />
+          </div>
 
-        {/* ---------- 底部：輸入區 ---------- */}
-        <div className="p-3 border-top bg-white">
-          <Form
-            onSubmit={(e) => {
-              e.preventDefault();
-              sendMessage();
-            }}
-          >
-            <InputGroup>
-              <Form.Control
-                type="text"
-                placeholder="輸入訊息…"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                disabled={!isConnected}
-                className="rounded-pill bg-light border-0 me-2"
-              />
-              <Button
-                variant="primary"
-                onClick={sendMessage}
-                disabled={!isConnected || !inputMessage.trim()}
-                className={`d-flex align-items-center justify-content-center ${
-                  inputMessage.trim() ? "send-btn-expanded" : "send-btn-compact"
-                }`}
-                style={{
-                  borderRadius: "25px",
-                  height: "50px",
-                  minWidth: inputMessage.trim() ? "90px" : "50px",
-                  transition: "all 0.3s ease",
-                }}
-              >
-                <i className="bi bi-send-fill" style={{ fontSize: "18px" }}></i>
-                {inputMessage.trim() && <span className="ms-2">送出</span>}
-              </Button>
-            </InputGroup>
-          </Form>
-        </div>
-      </Modal.Body>
-    </Modal>
+          {/* ---------- 底部：輸入區 ---------- */}
+          <div className="p-3 border-top bg-white">
+            <Form
+              onSubmit={(e) => {
+                e.preventDefault();
+                sendMessage();
+              }}
+            >
+              <InputGroup>
+                <Form.Control
+                  type="text"
+                  placeholder="輸入訊息…"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  disabled={!isConnected}
+                  className="rounded-pill bg-light border-0 me-2"
+                />
+                <Button
+                  variant="primary"
+                  onClick={sendMessage}
+                  disabled={!isConnected || !inputMessage.trim()}
+                  className={`d-flex align-items-center justify-content-center ${
+                    inputMessage.trim()
+                      ? "send-btn-expanded"
+                      : "send-btn-compact"
+                  }`}
+                  style={{
+                    borderRadius: "25px",
+                    height: "50px",
+                    minWidth: inputMessage.trim() ? "90px" : "50px",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  <i
+                    className="bi bi-send-fill"
+                    style={{ fontSize: "18px" }}
+                  ></i>
+                  {inputMessage.trim() && <span className="ms-2">送出</span>}
+                </Button>
+              </InputGroup>
+            </Form>
+          </div>
+        </Modal.Body>
+      </Modal>
+    </CenteredModalWrapper>
   );
 };
 
