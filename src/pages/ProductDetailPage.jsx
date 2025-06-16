@@ -323,10 +323,10 @@ function ProductDetailPage() {
                       <p className="text-muted mb-0">{store.description}</p>
                     </div>
                   </div>
-                  <Button variant="outline-primary" className="gap-2" size="sm">
+                  {/* <Button variant="outline-primary" className="gap-2" size="sm">
                     <i className="bi bi-info-circle me-2 "></i>
                     查看店家頁面
-                  </Button>
+                  </Button> */}
                   <Button
                     className="ms-2"
                     variant="outline-primary"

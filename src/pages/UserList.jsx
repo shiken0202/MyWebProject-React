@@ -4,6 +4,7 @@ import { Container, Table, Button } from "react-bootstrap";
 import { useUser } from "../context/UserContext";
 function UserList() {
   const [users, setUsers] = useState([]);
+
   const { userId, username, emailcheck, role } = useUser();
   useEffect(() => {
     fetchUsers(); // 在元件掛載時獲取使用者資料
@@ -19,6 +20,46 @@ function UserList() {
       console.log(resData.data);
       setUsers(resData.data);
     } catch (error) {}
+  };
+  const handleBlockClick = async (id) => {
+    const isConfirmed = window.confirm("確定要封鎖該使用者?");
+    if (!isConfirmed) {
+      return;
+    }
+    try {
+      const res = await fetch(`http://localhost:8080/user/block/${id}`, {
+        method: "PUT",
+        credentials: "include",
+      });
+      if (res.ok) {
+        const resData = await res.json();
+        console.log(resData);
+        alert(resData.message);
+        fetchUsers();
+      }
+    } catch (err) {
+      alert(err.message());
+    }
+  };
+  const handleUnBlockClick = async (id) => {
+    const isConfirmed = window.confirm("確定要封鎖該使用者?");
+    if (!isConfirmed) {
+      return;
+    }
+    try {
+      const res = await fetch(`http://localhost:8080/user/unblock/${id}`, {
+        method: "PUT",
+        credentials: "include",
+      });
+      if (res.ok) {
+        const resData = await res.json();
+        console.log(resData);
+        alert(resData.message);
+        fetchUsers();
+      }
+    } catch (err) {
+      alert(err.message());
+    }
   };
   const roleMap = { ADMIN: "管理員", BUYER: "買家", SELLER: "賣家" };
   return (
@@ -51,20 +92,29 @@ function UserList() {
                 <td>{user.isbanned ? "已封鎖" : "優質用戶"}</td>
                 <td>{roleMap[user.role]}</td>
                 <td>
-                  <Button
-                    variant="warning"
-                    className="me-3"
-                    disabled={user.role == "ADMIN"}
-                  >
-                    封鎖
-                  </Button>
-                  <Button
-                    variant="danger"
-                    className="me-3"
-                    disabled={user.role == "ADMIN"}
-                  >
-                    刪除
-                  </Button>
+                  {user.isbanned ? (
+                    <Button
+                      variant="warning"
+                      className="me-3"
+                      disabled={user.role == "ADMIN"}
+                      onClick={(e) => {
+                        e.preventDefault, handleUnBlockClick(user.id);
+                      }}
+                    >
+                      解除封鎖
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline-warning"
+                      className="me-3"
+                      disabled={user.role == "ADMIN"}
+                      onClick={(e) => {
+                        e.preventDefault, handleBlockClick(user.id);
+                      }}
+                    >
+                      封鎖
+                    </Button>
+                  )}
                 </td>
               </tr>
             ))}

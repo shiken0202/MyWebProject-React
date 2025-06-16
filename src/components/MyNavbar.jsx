@@ -227,16 +227,6 @@ function MyNavbar() {
           <>
             <Nav.Link
               as={Link}
-              to="/user/myproduct"
-              onClick={(e) => {
-                e.preventDefault();
-                EmailchcekHandler(e, "/user/myorder");
-              }}
-            >
-              🌸商品管理
-            </Nav.Link>
-            <Nav.Link
-              as={Link}
               to="/user/userlist"
               onClick={(e) => {
                 e.preventDefault();

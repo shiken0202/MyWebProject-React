@@ -25,8 +25,6 @@ const CenteredModalWrapper = ({ children, show }) =>
 
 //只要 DraggableDialog 在 function 外部宣告，React 只會認得它是同一個元件，Modal 內容就不會每次輸入都被重建
 const DraggableDialog = React.forwardRef((props, ref) => {
-  // 只計算一次，保證每次 render 都是同一個初始座標
-
   return (
     <Draggable handle=".modal-header" nodeRef={ref}>
       <div
@@ -35,7 +33,7 @@ const DraggableDialog = React.forwardRef((props, ref) => {
         style={{
           position: "fixed",
           top: "20%",
-          left: "35%",
+          left: "30%",
           width: "800px",
           height: "1000px",
           transform: "translateX(-50%)",
@@ -232,7 +230,6 @@ const ChatRoom = ({
         size="md"
         dialogAs={DraggableDialog}
         enforceFocus={false}
-        backdrop={false}
         {...otherProps}
       >
         {/* ---------- 頂端：漸層標題 ---------- */}
