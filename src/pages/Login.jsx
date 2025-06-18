@@ -145,14 +145,14 @@ function Login() {
               登入
             </Button>
           </Form>
-          <Button
+          {/* <Button
             variant="outline-primary"
             as={Link}
             to="/register"
             className="me-3 mt-3 w-100"
           >
             忘記密碼
-          </Button>
+          </Button> */}
           <Button
             variant="outline-primary"
             as={Link}
