@@ -46,7 +46,6 @@ function MyNavbar() {
       return () => clearTimeout(timeoutId);
     }
   }, [isLoggedIn, userId]);
-  console.log("UserId:" + userId);
 
   const fetchChatRooms = async () => {
     // 確保 userId 存在且有效
@@ -66,7 +65,7 @@ function MyNavbar() {
 
       if (res.ok) {
         const resData = await res.json();
-        console.log("聊天室資料:", resData.data);
+
         setChatRooms(resData.data || []);
       } else {
         console.error("API 請求失敗:", res.status, res.statusText);
@@ -80,7 +79,6 @@ function MyNavbar() {
   };
   const buyersChatRooms = (chatRooms || []).filter((f) => f.buyerId == userId);
   const storeChatRooms = (chatRooms || []).filter((f) => f.sellerId == userId);
-  console.log(buyersChatRooms);
 
   const handleChatRoomsClick = (chatRoom) => {
     setSelectedChatRoom(chatRoom);

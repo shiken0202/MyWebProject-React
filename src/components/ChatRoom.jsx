@@ -107,7 +107,6 @@ const ChatRoom = ({
       );
       if (response.ok) {
         const chatRoom = await response.json();
-        console.log(chatRoom);
 
         if (chatRoom && chatRoom.data.id) {
           setChatRoomId(chatRoom.data.id);
@@ -186,7 +185,6 @@ const ChatRoom = ({
         const data = await response.json();
         if (data.data && data.data.length > 0) {
           setMessages(data.data);
-          console.log(data.data);
 
           messagesRef.current = data.data;
         }

@@ -1,4 +1,3 @@
-// src/pages/ProductPage.jsx
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import ProductCard from "../components/ProductCard";
@@ -34,7 +33,6 @@ function ProductPage() {
         if (res.ok) {
           const resData = await res.json();
           setProducts(resData.data || []);
-          console.log("商品資料:", resData);
         }
       } catch (error) {
         console.error("載入商品失敗:", error);
@@ -72,7 +70,6 @@ function ProductPage() {
   // 找到主分類和子分類物件
   const mainCategory = findMainCategoryByName(main);
   const subCategory = findSubCategoryByName(sub, mainCategory?.id);
-  console.log(mainCategory);
 
   // 檢查分類是否存在
   if (!mainCategory || !subCategory) {
@@ -89,12 +86,10 @@ function ProductPage() {
     );
   }
 
-  // 過濾商品[
   const filteredProducts = products
     .filter((p) => p.categoryId === subCategory.id)
     .filter((p) => p.isActive === true);
 
-  // 商品載入中
   if (loading) {
     return (
       <>

@@ -22,7 +22,6 @@ function SearchPage() {
     );
     setProducts(res.data.data);
   };
-  console.log(products);
 
   const filteredProducts = products.filter((p) => p.isActive === true);
   return (

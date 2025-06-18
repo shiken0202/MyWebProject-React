@@ -7,7 +7,7 @@ function UserList() {
 
   const { userId, username, emailcheck, role } = useUser();
   useEffect(() => {
-    fetchUsers(); // 在元件掛載時獲取使用者資料
+    fetchUsers();
   }, []);
   const fetchUsers = async () => {
     try {
@@ -16,8 +16,7 @@ function UserList() {
         credentials: "include",
       });
       const resData = await res.json();
-      console.log(resData);
-      console.log(resData.data);
+
       setUsers(resData.data);
     } catch (error) {}
   };
@@ -33,7 +32,7 @@ function UserList() {
       });
       if (res.ok) {
         const resData = await res.json();
-        console.log(resData);
+
         alert(resData.message);
         fetchUsers();
       }
@@ -53,7 +52,7 @@ function UserList() {
       });
       if (res.ok) {
         const resData = await res.json();
-        console.log(resData);
+
         alert(resData.message);
         fetchUsers();
       }

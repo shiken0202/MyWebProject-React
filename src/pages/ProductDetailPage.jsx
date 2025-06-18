@@ -28,7 +28,6 @@ function ProductDetailPage() {
     fetchViewCount(id);
     fetchCurrencyRate();
   }, [id]);
-  console.log(product);
 
   async function fetchCurrencyRate() {
     const res = await fetch("http://localhost:8080/twd-jpy", {
@@ -37,7 +36,7 @@ function ProductDetailPage() {
     });
     if (res.ok) {
       const resData = await res.json();
-      console.log(resData);
+
       setRate(resData.data);
     }
   }
@@ -85,7 +84,6 @@ function ProductDetailPage() {
       credentials: "include",
     });
     const resData = await res.json();
-    console.log(resData.data);
 
     setStores(resData.data || []);
   }
@@ -352,7 +350,6 @@ function ProductDetailPage() {
                 storeName={store.storeName}
               />
             )}
-            {console.log(userId)}
           </Col>
         </Row>
       </Container>

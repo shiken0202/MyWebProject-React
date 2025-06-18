@@ -31,7 +31,6 @@ function Cart() {
       credentials: "include",
     });
     const resData = await res.json();
-    console.log(resData.data);
 
     setStores(resData.data || []);
   }
@@ -54,7 +53,7 @@ function Cart() {
       alert(error.message);
     }
   }
-  console.log(items);
+
   const updateQuantity = async (index, newQuantity) => {
     const quantity = Math.max(1, parseInt(newQuantity) || 1);
     if (quantity > items[index].stock) {
@@ -170,10 +169,9 @@ function Cart() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderDataArray), // 傳送的是陣列！
+        body: JSON.stringify(orderDataArray), // 傳送的是陣列
       });
 
-      // 統一處理回應
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || `${res.status} 訂單建立失敗`);

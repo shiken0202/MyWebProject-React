@@ -21,11 +21,9 @@ function EmailConfirmPage() {
       }
     )
       .then((res) => {
-        console.log(res);
         return res.json();
       })
       .then((data) => {
-        console.log(data);
         if (data.status == 200) {
           navigate("/email-confirm-success");
         } else {

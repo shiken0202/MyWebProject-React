@@ -20,7 +20,6 @@ function Login() {
   const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
 
-  // 載入或刷新驗證碼圖片
   const fetchCaptcha = () => {
     // 加上時間戳避免快取
     setCaptchaImgUrl(`http://localhost:8080/captcha?${Date.now()}`);
@@ -56,20 +55,20 @@ function Login() {
       const res = await fetch("http://localhost:8080/login", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        credentials: "include", // 重要！帶上 session cookie
+        credentials: "include",
         body: new URLSearchParams({ username, password, captchaInput }),
       });
       if (res.ok) {
         setLoginError("");
         const resData = await res.json();
-        console.log(resData);
+
         alert(resData.message);
         navigate("/");
         // window.location.href = '/';
       } else {
         const msg = await res.text();
         setLoginError("登入失敗，請檢查帳號密碼或驗證碼" || msg);
-        fetchCaptcha(); // 登入失敗時刷新驗證碼
+        fetchCaptcha();
       }
     } catch (err) {
       setLoginError("伺服器錯誤，請稍後再試");

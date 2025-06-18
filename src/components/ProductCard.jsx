@@ -74,7 +74,6 @@ function ProductCard({ product }) {
             <br />
             瀏覽次數:{product.viewCount}
           </Card.Text>
-          {/* 可加購物車按鈕 */}
         </Card.Body>
       </Card>
     </Link>

@@ -43,8 +43,8 @@ function HomePage() {
               // 如果商品屬於該主分類的子分類
               return subToMainMap[product.categoryId] === mainCat.id;
             })
-            .filter((p) => p.isActive !== false) // 只顯示上架商品（如果有 isActive 欄位）
-            .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0)); // 修正欄位名稱
+            .filter((p) => p.isActive !== false)
+            .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
 
           // 只有該主分類有商品時才顯示
           if (categoryProducts.length === 0) return null;

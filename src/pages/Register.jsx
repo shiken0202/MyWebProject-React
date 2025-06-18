@@ -17,7 +17,7 @@ function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState(""); // 新增角色狀態
+  const [role, setRole] = useState("");
   const [errors, setErrors] = useState({});
   const [registerError, setRegisterError] = useState("");
   const navigate = useNavigate();
@@ -66,7 +66,7 @@ function Register() {
           username,
           password,
           email,
-          role, // 加入角色參數
+          role,
         }),
       });
 
@@ -125,7 +125,6 @@ function Register() {
               )}
             </Form.Group>
 
-            {/* 原有表單欄位保持不變 */}
             <Form.Group className="mb-3" controlId="formUsername">
               <Form.Label>帳號</Form.Label>
               <Form.Control

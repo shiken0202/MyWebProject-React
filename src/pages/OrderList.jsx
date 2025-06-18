@@ -33,7 +33,6 @@ function OrderList() {
     });
     if (res.ok) {
       const resData = await res.json();
-      console.log(resData);
 
       setProducts(resData.data || []);
     }
@@ -45,8 +44,7 @@ function OrderList() {
         credentials: "include",
       });
       const resData = await res.json();
-      console.log(resData);
-      console.log(resData.data);
+
       setUsers(resData.data);
     } catch (error) {}
   };
@@ -56,7 +54,6 @@ function OrderList() {
       credentials: "include",
     });
     const resData = await res.json();
-    console.log(resData.data);
 
     setStores(resData.data || []);
   }
@@ -69,7 +66,6 @@ function OrderList() {
 
       const resData = await res.json();
       setBuyerOrders(Array.isArray(resData.data) ? resData.data : []);
-      console.log(resData);
     } catch (error) {
       return "錯誤";
     }
@@ -81,7 +77,6 @@ function OrderList() {
     });
     const resData = await res.json();
     setStoreOrders(Array.isArray(resData.data) ? resData.data : []);
-    console.log(resData.data);
   }
   const CurrentBuyerOrders = buyerOrders.filter(
     (bos) => bos.status != "已完成" && bos.status != "已取消"
@@ -151,7 +146,6 @@ function OrderList() {
       alert(error.message);
     }
   };
-  console.log(editOrderId);
 
   const handleStatusEditOn = (order) => {
     setEditOrderId(order.id);
@@ -169,10 +163,8 @@ function OrderList() {
     if (res.ok) {
       const resData = await res.json();
       setItems(resData.data);
-      console.log(resData);
     }
   };
-  console.log(items);
 
   const Orders = () => {
     switch (role) {

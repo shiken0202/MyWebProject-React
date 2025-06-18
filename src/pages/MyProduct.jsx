@@ -36,8 +36,7 @@ function MyProduct() {
   if (!userId) {
     return <Navigate to="/" replace />;
   }
-  console.log(userId);
-  console.log(username);
+
   useEffect(() => {
     fetchStoreInfo();
     fetchMainCategories();
@@ -55,7 +54,6 @@ function MyProduct() {
       });
       const resData = await res.json();
       setMainCategories(resData.data);
-      console.log(resData);
     } catch (error) {
       console.error("載入主分類失敗:", error);
     }
@@ -67,7 +65,6 @@ function MyProduct() {
         { method: "GET", credentials: "include" }
       );
       const resData = await res.json();
-      console.log(resData);
 
       setSubCategories(resData.data);
     } catch (error) {
@@ -91,7 +88,7 @@ function MyProduct() {
         `http://localhost:8080/products/store/${storeInfo.id}`
       );
       const resData = await res.json();
-      console.log(resData);
+
       setProducts(resData.data);
     } catch (error) {
       console.error("取得商品失敗:", error);
@@ -104,7 +101,6 @@ function MyProduct() {
     });
     const resData = await res.json();
     setStoreInfo(resData.data);
-    console.log(resData);
   };
   const createStore = async (e) => {
     e.preventDefault();
@@ -131,7 +127,7 @@ function MyProduct() {
       const data = await res.json();
       if (res.ok) {
         alert("商店創建成功！");
-        setStoreInfo(data.data); // 假設後端回傳新商店資訊
+        setStoreInfo(data.data);
         fetchStoreInfo();
       } else {
         alert(data.message || "創建失敗");
@@ -172,7 +168,7 @@ function MyProduct() {
       if (res.ok) {
         alert("商店資訊更新成功！");
         setShowEditModal(false);
-        fetchStoreInfo(); // 重新載入商店資訊
+        fetchStoreInfo();
       } else {
         const errorData = await res.json();
         alert(errorData.message || "更新失敗");
@@ -360,7 +356,7 @@ function MyProduct() {
       const data = await res.json();
       if (res.ok) {
         alert(data.message || "所有照片已刪除！");
-        // 重新載入商品或圖片列表
+
         fetchProducts();
       } else {
         alert(data.message || "批次刪除失敗");
@@ -378,7 +374,7 @@ function MyProduct() {
       const data = await res.json();
       if (res.ok) {
         alert(data.message || "上架成功！");
-        // 重新載入商品或圖片列表
+
         fetchProducts();
       } else {
         alert(data.message || "上架失敗");
@@ -396,7 +392,7 @@ function MyProduct() {
       const data = await res.json();
       if (res.ok) {
         alert(data.message || "下架成功！");
-        // 重新載入商品或圖片列表
+
         fetchProducts();
       } else {
         alert(data.message || "下架失敗");

@@ -1,4 +1,3 @@
-// src/contexts/CategoryContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 const CategoryContext = createContext();
