@@ -1,10 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Accordion, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { Container, Table, Button, Modal, Form } from "react-bootstrap";
+import {
+  Container,
+  Table,
+  Button,
+  Modal,
+  Form,
+  InputGroup,
+} from "react-bootstrap";
 import MyNavbar from "../components/MyNavbar";
 import { useUser } from "../context/UserContext";
+
 function MyProduct() {
+  //AI區塊
+  const [question, setQuestion] = useState("");
+  const [response, setResponse] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
+  //
   const [products, setProducts] = useState([]);
   const [storeInfo, setStoreInfo] = useState(null);
   const [storeName, setStoreName] = useState("");
@@ -33,10 +46,84 @@ function MyProduct() {
   const [uploadProducImageId, setUploadProducImageId] = useState(null);
   const [editDescription, setEditDescription] = useState("");
   const { userId, username, emailcheck, role } = useUser();
+  // 使用 useRef 來保存 EventSource 實例，避免因為 re-render 而重複建立
+  const eventSourceRef = useRef(null);
   if (!userId) {
     return <Navigate to="/" replace />;
   }
+  const handleGenerateDescription = (e) => {
+    e.preventDefault();
+    if (!question || isStreaming) {
+      return;
+    }
 
+    // 清空上次的回答
+    setDescription("");
+    setIsStreaming(true);
+    const prompt = `請幫我生成一段商店描述，風格要生動有趣，關鍵字是：「${question}」，請不要給我這種回應[好嘞！這就給你寫一段生動有趣，充滿日系風格的商店描述：],或是補充說明，直接給我一段描述大約200字`;
+    // 建立 EventSource 連線
+    const url = `http://localhost:8080/ai/ask?q=${encodeURIComponent(prompt)}`;
+    const es = new EventSource(url);
+    eventSourceRef.current = es;
+
+    // 監聽 open 事件
+    es.onopen = () => {
+      console.log("SSE connection opened.");
+    };
+
+    // 監聽 message 事件
+    es.onmessage = (event) => {
+      // 使用 functional update 確保 state 更新是基於最新的狀態
+      setDescription((prevResponse) => prevResponse + event.data);
+    };
+
+    // 監聽 error 事件
+    es.onerror = (err) => {
+      console.error("EventSource failed:", err);
+      es.close();
+      setIsStreaming(false);
+    };
+  };
+  const handleEditGenerateDescription = (e) => {
+    e.preventDefault();
+    if (!question || isStreaming) {
+      return;
+    }
+
+    // 清空上次的回答
+    setEditDescription("");
+    setIsStreaming(true);
+    const prompt = `請幫我生成一段商店描述，風格要生動有趣，關鍵字是：「${question}」，我的商店名稱是商店名稱:${storeInfo.storeName},請不要給我[好的，沒問題等],或是補充說明，請直接給我一段描述，大約200字`;
+    // 建立 EventSource 連線
+    const url = `http://localhost:8080/ai/ask?q=${encodeURIComponent(prompt)}`;
+    const es = new EventSource(url);
+    eventSourceRef.current = es;
+
+    // 監聽 open 事件
+    es.onopen = () => {
+      console.log("SSE connection opened.");
+    };
+
+    // 監聽 message 事件
+    es.onmessage = (event) => {
+      // 使用 functional update 確保 state 更新是基於最新的狀態
+      setEditDescription((prevResponse) => prevResponse + event.data);
+    };
+
+    // 監聽 error 事件
+    es.onerror = (err) => {
+      console.error("EventSource failed:", err);
+      es.close();
+      setIsStreaming(false);
+    };
+  };
+  useEffect(() => {
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+    };
+  }, []);
   useEffect(() => {
     fetchStoreInfo();
     fetchMainCategories();
@@ -439,7 +526,9 @@ function MyProduct() {
                 className="mb-3"
                 controlId="exampleForm.ControlInput1"
               >
-                <Form.Label>商店名稱</Form.Label>
+                <Form.Label>
+                  商店名稱<span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="請輸入商店名稱"
@@ -447,18 +536,41 @@ function MyProduct() {
                   onChange={(e) => setStoreName(e.target.value)}
                 />
               </Form.Group>
-              <Form.Group
-                className="mb-3"
-                controlId="exampleForm.ControlTextarea1"
-              >
-                <Form.Label>商店描述</Form.Label>
+              <Form.Group className="mb-3" controlId="storeDescription">
+                <Form.Label>
+                  商店描述<span className="text-danger">*</span>
+                </Form.Label>
                 <Form.Control
                   as="textarea"
-                  placeholder="請描述一下你是甚麼樣類型的商店"
+                  placeholder="請描述一下您的商店，或使用下方的 AI 小幫手來生成"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  rows={3}
+                  style={{ height: "500px" }}
+                  rows={5}
+                  required
                 />
+              </Form.Group>
+              <Form.Group className="mb-4" controlId="aiHelper">
+                <Form.Label>AI 描述小幫手 ✨</Form.Label>
+                <InputGroup>
+                  <Form.Control
+                    placeholder="輸入關鍵字，例如：一個專賣可愛貓咪商品的商店"
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    disabled={isStreaming}
+                  />
+                  <Button
+                    variant="outline-primary"
+                    onClick={handleGenerateDescription}
+                    disabled={isStreaming || !question}
+                    type="button" // 重要的！避免這個按鈕提交整個表單
+                  >
+                    {isStreaming ? "生成中..." : "讓 AI 幫你想"}
+                  </Button>
+                </InputGroup>
+                <Form.Text className="text-muted">
+                  點擊按鈕後，AI 會將生成的描述即時填入上方的「商店描述」欄位。
+                </Form.Text>
               </Form.Group>
               <Button variant="warning" type="submit">
                 創建商店
@@ -495,8 +607,32 @@ function MyProduct() {
                         placeholder="請描述一下你是甚麼樣類型的商店"
                         rows={3}
                         value={editDescription}
+                        style={{ height: "500px" }}
                         onChange={(e) => setEditDescription(e.target.value)}
                       />
+                    </Form.Group>
+                    <Form.Group className="mb-4" controlId="aiHelper">
+                      <Form.Label>AI 描述小幫手 ✨</Form.Label>
+                      <InputGroup>
+                        <Form.Control
+                          placeholder="輸入關鍵字，例如：一個專賣可愛貓咪商品的商店"
+                          value={question}
+                          onChange={(e) => setQuestion(e.target.value)}
+                          disabled={isStreaming}
+                        />
+                        <Button
+                          variant="outline-primary"
+                          onClick={handleEditGenerateDescription}
+                          disabled={isStreaming || !question}
+                          type="button" // 重要的！避免這個按鈕提交整個表單
+                        >
+                          {isStreaming ? "生成中..." : "讓 AI 幫你想"}
+                        </Button>
+                      </InputGroup>
+                      <Form.Text className="text-muted">
+                        點擊按鈕後，AI
+                        會將生成的描述即時填入上方的「商店描述」欄位。
+                      </Form.Text>
                     </Form.Group>
                   </Modal.Body>
                   <Modal.Footer>

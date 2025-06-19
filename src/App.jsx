@@ -16,6 +16,7 @@ import SearchPage from "./pages/SearchPage";
 import EmailConfirmPage from "./pages/EmailConfirmPage";
 import EmailConfirmSuccessPage from "./pages/EmailConfirmSuccessPage";
 import EmailConfirmErrorPage from "./pages/EmailConfirmErrorPage";
+import AiChat from "./components/AiChat";
 function App() {
   return (
     <BrowserRouter>
@@ -82,6 +83,7 @@ function App() {
               path="/email-confirm-error"
               element={<EmailConfirmErrorPage />}
             />
+            <Route path="/ai" element={<AiChat />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </CategoryProvider>
